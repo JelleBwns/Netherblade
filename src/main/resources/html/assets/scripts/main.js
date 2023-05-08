@@ -533,18 +533,6 @@ function right(response) {
     return right;
 }
 
-window.addEventListener('resize', function () {
-    var element = document.getElementById('topelement');
-    var windowHeight = window.innerHeight;
-    var elementHeight = element.scrollHeight;
-    var maxAllowedHeight = windowHeight * 0.9;
-
-    if (elementHeight > maxAllowedHeight) {
-        element.style.maxHeight = maxAllowedHeight + 'px';
-    } else {
-        element.style.maxHeight = '90vh';
-    }
-});
 
 function expand() {
     const expand = document.createElement("div");

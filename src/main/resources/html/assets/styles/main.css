@@ -15,16 +15,16 @@ body {
 }
 
 body {
-    border-bottom: 5px rgb(224, 224, 224) solid;
+    border: 5px rgb(224, 224, 224) solid;
+    flex-direction: column;
+    border-top: none;
+    display: flex;
 }
 
 #display {
     overflow-y: scroll;
     width: 100%;
     margin-top: 0 !important;
-    border: 5px rgb(224, 224, 224) solid;
-    border-bottom: none;
-    border-top: none;
     height: 100%;
 }
 
@@ -36,8 +36,7 @@ body {
     justify-content: space-between;
     align-items: center;
     align-content: center;
-    height: 100%;
-    max-height: 900px;
+    overflow: auto;
 }
 
 #regions {
