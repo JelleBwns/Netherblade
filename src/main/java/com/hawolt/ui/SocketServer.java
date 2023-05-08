@@ -7,6 +7,9 @@ import org.java_websocket.server.WebSocketServer;
 
 import javax.swing.*;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created: 19/11/2022 21:19
@@ -14,7 +17,11 @@ import java.net.InetSocketAddress;
  **/
 
 public class SocketServer extends WebSocketServer {
+    public static final List<String> cache = new LinkedList<>();
+    private static final List<String> queue = new ArrayList<>();
     private static SocketServer instance;
+    private static boolean connected;
+
     public SocketServer(InetSocketAddress address) {
         super(address);
     }
@@ -25,12 +32,22 @@ public class SocketServer extends WebSocketServer {
     }
 
     public static void forward(String message) {
-        instance.broadcast(message);
+        SocketServer.cache.add(message);
+        if (SocketServer.connected) {
+            instance.broadcast(message);
+        } else {
+            SocketServer.queue.add(message);
+        }
     }
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
         Logger.debug("Chromium connected to local WebSocket server");
+        if (SocketServer.connected = true) {
+            for (String message : queue) {
+                forward(message);
+            }
+        }
     }
 
     @Override
