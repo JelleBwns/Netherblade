@@ -159,7 +159,7 @@ public class LocalExecutor {
                     received.put("body", response.getByteBody() != null ? new String(response.getByteBody()) : JSONObject.NULL);
                     object.put("received", received);
 
-                    object.put("protocol", "http");
+                    object.put("type", "http");
                     SocketServer.forward(object.toString());
                     return response;
                 }

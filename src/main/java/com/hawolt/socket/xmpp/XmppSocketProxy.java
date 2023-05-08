@@ -15,7 +15,7 @@ public class XmppSocketProxy extends DataSocketProxy<String> {
     @Override
     public byte[] onServerData(byte[] b) {
         String xml = new String(b);
-        JSONObject o = new JSONObject().put("protocol", "xmpp");
+        JSONObject o = new JSONObject().put("type", "xmpp");
         SocketServer.forward(o.put("in", xml).toString());
         Logger.debug("[xmpp] < {}", xml);
         return b;
@@ -24,7 +24,7 @@ public class XmppSocketProxy extends DataSocketProxy<String> {
     @Override
     public byte[] onApplicationData(byte[] b) {
         String xml = new String(b);
-        JSONObject o = new JSONObject().put("protocol", "xmpp");
+        JSONObject o = new JSONObject().put("type", "xmpp");
         SocketServer.forward(o.put("out", xml).toString());
         Logger.debug("[xmpp] > {}", xml);
         return b;

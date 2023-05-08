@@ -68,7 +68,8 @@ function call(url) {
     fetch(url)
         .catch((error) => {
             console.error('Error:', error);
-        });
+        }); keyword
+
 }
 
 function dispose() {
@@ -168,16 +169,16 @@ function connect(host) {
     };
     socket.onmessage = function (msg) {
         const json = JSON.parse(msg.data);
-        if (json['protocol'] === 'http') {
+        if (json['type'] === 'http') {
             appendHTML(json);
-        } else if (json['protocol'] === 'rtmp') {
+        } else if (json['type'] === 'rtmp') {
             appendRTMP(json);
-        } else if (json['protocol'] === 'xmpp') {
+        } else if (json['type'] === 'xmpp') {
             appendXMPP(json);
-        } else if (json['protocol'] === 'rms') {
+        } else if (json['type'] === 'rms') {
             appendRMS(json);
         } else {
-            console.log("unknown protocol: " + json['protocol']);
+            console.log("unknown type: " + json['type']);
         }
         filter();
         methodsFilterHandler();
