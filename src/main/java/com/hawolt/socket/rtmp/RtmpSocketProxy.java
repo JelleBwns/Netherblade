@@ -33,7 +33,7 @@ public class RtmpSocketProxy extends DataSocketProxy<TypedObject> {
             if (++count < 6) return b;
             TypedObject object = incoming.decode(Arrays.copyOfRange(b, 12, b.length), new TypedObject());
             JSONObject json = TypedObject.tidy(object);
-            JSONObject o = new JSONObject().put("protocol", "rtmp");
+            JSONObject o = new JSONObject().put("type", "rtmp");
             SocketServer.forward(o.put("in", json).toString());
             Logger.debug("[rtmp] < {}", json);
         } catch (Exception e) {
@@ -48,7 +48,7 @@ public class RtmpSocketProxy extends DataSocketProxy<TypedObject> {
             if (++count < 6) return b;
             TypedObject object = incoming.decode(Arrays.copyOfRange(b, 12, b.length), new TypedObject());
             JSONObject json = TypedObject.tidy(object);
-            JSONObject o = new JSONObject().put("protocol", "rtmp");
+            JSONObject o = new JSONObject().put("type", "rtmp");
             SocketServer.forward(o.put("out", json).toString());
             Logger.debug("[rtmp] > {}", json);
         } catch (Exception e) {

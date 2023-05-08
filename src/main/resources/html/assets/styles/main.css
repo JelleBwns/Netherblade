@@ -1,33 +1,88 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
 
-html, body {
+html,
+body {
     font-family: 'Roboto', sans-serif;
-    background: #0a0e12;
-    color: #F5F5F5;
-    display: flex;
+    background-color: #1f2b38 !important;
+    color: #f5f5f5;
+    display: block;
     height: 100%;
     width: 100%;
-    margin: 0px;
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
-.stack-vertical {
+body {
+    border: 5px rgb(224, 224, 224) solid;
     flex-direction: column;
+    border-top: none;
     display: flex;
-    width: 100%;
 }
 
-.header-fixed {
-    background-color: #0a0e12;
-    position: fixed;
+#display {
+    overflow-y: scroll;
     width: 100%;
+    margin-top: 0 !important;
+    height: 100%;
 }
 
-.header {
-    align-content: center;
+
+#topelement {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
-    display: flex;
-    margin: 5px;
-    gap: 10px;
+    align-content: center;
+    overflow: auto;
+}
+
+#regions {
+    text-align: left;
+}
+
+#display::-webkit-scrollbar {
+    width: 0.6rem;
+}
+
+#display::-webkit-scrollbar-track {
+    background: #283a50;
+    border-radius: 10px;
+}
+
+#display::-webkit-scrollbar-thumb {
+    background: #ffffff;
+    border-radius: 10px;
+}
+
+.main {
+    display: block;
+}
+
+.extras {
+    display: none;
+}
+
+.mitm {
+    display: none;
+}
+
+.settings {
+    display: none;
+}
+
+.console {
+    display: none;
+}
+
+.spacing {
+    width: 1rem;
+}
+
+.data {
+    width: -webkit-fill-available;
 }
 
 .methodsFilter {
@@ -53,40 +108,106 @@ html, body {
 }
 
 .region {
-    border-radius: 8px;
-    height: 28px;
+    width: fit-content;
+    height: fit-content;
+    background-color: #e0e0e0 !important;
+    border-color: #e0e0e0 !important;
 }
 
-.ui-button {
-    border-radius: 8px;
-    height: 30px;
+.region:hover, .methodsFilter:hover {
+    background-color: #ffffff !important;
+    border-color: black !important;
 }
 
-.tiny {
-    min-width: 30px;
+.meow {
+    width: 100%;
+    flex-direction: row !important;
 }
 
-.medium {
-    min-width: 100px;
+.show {
+    height: fit-content;
+    padding: 5px;
+    background-color: #ffffff !important;
+    column-gap: 1rem !important;
+    flex-direction: column;
+    display: flex;
+    transition: background-color 0.5s ease-in-out;
+    gap: 0.5rem !important;
+    margin-top: 0.73rem;
+    border-radius: 0px 0px 8px 8px;
 }
 
-.big {
-    min-width: 125px;
+.navbar {
+    height: 4rem !important;
+    background-color: #e0e0e0 !important;
+    transition: all 0.5s ease-in-out;
+    border-radius: 0rem;
+    width: 100%;
+    margin: 0 !important;
+}
+
+.navbar:hover {
+    background-color: #ffffff !important;
+}
+
+.searchinghelp {
+    width: 100% !important;
+    color: #ffffff !important;
+    background-color: #e0e0e0 !important;
+    transition: all 0.5s ease-in-out !important;
+    border: none !important;
+    border-radius: 0rem !important;
+    box-shadow: none !important;
+}
+
+.searchinghelp:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #1111118e !important;
+    border-radius: 0.5rem !important;
+}
+
+.flexing {
+    align-items: center;
+    align-content: center;
+}
+
+.a-WHIFF {
+    font-size: 0.8rem !important;
+    display: inline-block;
+}
+
+.btn-warning {
+    color: white !important;
+}
+
+.btn {
+    height: fit-content !important;
+    width: fit-content !important;
+    font-size: 0.8rem !important;
+}
+
+.stack-vertical {
+    flex-direction: column;
+    display: flex;
+    width: 100%;
+}
+
+.header-fixed {
+    background-color: #0a0e12;
+    position: fixed;
+    width: 100%;
+}
+
+.header {
+    align-content: center;
+    align-items: center;
+    display: flex;
+    gap: 10px;
 }
 
 .ui-button:hover {
     cursor: pointer;
-}
-
-.display {
-    flex-direction: column;
-    border-radius: 8px;
-    display: flex;
-    margin: 5px;
-    gap: 5px;
-    margin-top: 41px;
-    padding-bottom: 5px;
-
 }
 
 .hint {
@@ -95,7 +216,6 @@ html, body {
 
 .main-hint {
     background-color: #1f2b38;
-    border-radius: 8px;
     text-align: center;
     display: flex;
     height: 40px;
@@ -104,7 +224,7 @@ html, body {
 
 .bonus-hint {
     border-radius: 0px 0px 8px 8px;
-    background-color: #3A5169;
+    background-color: #3a5169;
     overflow-wrap: break-word;
     overflow: hidden;
     display: flex;
@@ -118,6 +238,12 @@ html, body {
     border-radius: 8px;
     padding: 5px;
     width: 70px;
+}
+
+.methodsFilter {
+    background-color: #e0e0e0 !important;
+    border-color: #e0e0e0 !important;
+    text-align: left !important;
 }
 
 .uri {
@@ -151,17 +277,14 @@ html, body {
     cursor: pointer;
 }
 
-.data {
-    border-right: 1px solid #1f2b38;
-    border-radius: 8px 0px 0px 8px;
-    background-color: #4d6278;
-    width: 100%;
+.request {
+    color: #ffffff !important;
 }
 
 .requestdata {
     border-right: 1px solid #1f2b38;
     border-radius: 8px 0px 0px 8px;
-    background-color: #4d6278;
+    background-color: #354557;
     width: 50%;
 }
 
@@ -207,10 +330,10 @@ html, body {
 }
 
 .request-value {
-    white-space: pre-wrap;
     background: #263544;
     border-radius: 8px;
     padding: 5px;
+    cursor: pointer;
 }
 
 .hidden {
@@ -225,5 +348,5 @@ html, body {
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none;
     /* Non-prefixed version, currently
-                                     supported by Chrome, Edge, Opera and Firefox */
+                                      supported by Chrome, Edge, Opera and Firefox */
 }

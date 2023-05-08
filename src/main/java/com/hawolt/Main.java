@@ -29,8 +29,21 @@ public class Main {
     public static RmsSocketProxy proxy;
 
     public static void main(String[] args) {
+        String version = System.getProperty("java.version");
+        int major = Integer.parseInt(version.split("\\.")[0]);
+        if (major <= 15) {
+            try {
+                ReflectHttp.enable("PATCH");
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                Logger.error(e);
+                System.err.println("Unable to modify permitted HTTP methods, exiting (1).");
+                System.exit(1);
+            }
+        } else {
+            System.err.println("Incompatible Java version, please use Java 8 upto 15.");
+            System.exit(1);
+        }
         try {
-            ReflectHttp.enable("PATCH");
             Javalin.create(config -> config.addStaticFiles("/html", Location.CLASSPATH))
                     .before("/v1/*", context -> {
                         context.header("Access-Control-Allow-Origin", "*");
@@ -71,10 +84,6 @@ public class Main {
                     proxy.start();
                 });
             });
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            Logger.error(e);
-            System.err.println("Unable to modify permitted HTTP methods, exiting (1).");
-            System.exit(1);
         } catch (IOException e) {
             Logger.error(e);
             System.err.println("Unable to launch Netherblade, exiting (1).");

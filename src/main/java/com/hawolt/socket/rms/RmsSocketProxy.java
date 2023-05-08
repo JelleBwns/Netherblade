@@ -57,7 +57,7 @@ public class RmsSocketProxy extends DataSocketProxy<WebsocketFrame> {
         } else {
             message = new String(frame.getPayload());
         }
-        JSONObject object = new JSONObject().put("protocol", "rms");
+        JSONObject object = new JSONObject().put("type", "rms");
         SocketServer.forward(object.put(in ? "in" : "out", new JSONObject(message)).toString());
         Logger.error("[rms] {} {}", in ? "<" : ">", message);
     }

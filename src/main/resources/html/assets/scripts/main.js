@@ -1,4 +1,26 @@
+let socket;
+
+function handle(i, e) {
+    let json = new Object();
+    json.type = i;
+    json.x = e.clientX;
+    json.y = e.clientY;
+    json.moveX = e.movementX;
+    json.moveY = e.movementY;
+    json.navbar = e.target.matches('.navbar');
+    socket.send(JSON.stringify(json));
+}
+
 window.onload = function () {
+    addEventListener("mousemove", e => {
+        handle(1, e)
+    });
+    addEventListener("mousedown", e => {
+        handle(2, e)
+    });
+    addEventListener("click", e => {
+        handle(3, e)
+    });
     fetch('http://localhost:35199/v1/client/available')
         .then((response) => response.json())
         .then((data) => {
@@ -6,10 +28,22 @@ window.onload = function () {
             data['regions'].sort();
             data['regions'].forEach((region) => {
                 let option = document.createElement("option");
+                if (region === "EUW") option.selected = true;
                 option.innerHTML = region;
                 option.value = region;
                 dropdown.appendChild(option);
-            })
+            });
+            // sort dropdown and make TEST always last
+            let options = Array.from(dropdown.options);
+            options.sort((a, b) => {
+                if (a.value === "TEST") return 1;
+                if (b.value === "TEST") return -1;
+                return a.value.localeCompare(b.value);
+            });
+            dropdown.innerHTML = "";
+            for (const option of options) {
+                dropdown.appendChild(option);
+            }
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -34,11 +68,24 @@ function call(url) {
     fetch(url)
         .catch((error) => {
             console.error('Error:', error);
-        });
+        }); keyword
+
 }
 
 function dispose() {
     call('http://localhost:35199/v1/config/close');
+}
+
+function maximize() {
+    call('http://localhost:35199/v1/config/maximize');
+}
+
+function minimize() {
+    call('http://localhost:35199/v1/config/minimize');
+}
+
+function wiki() {
+    call('http://localhost:35199/v1/config/wiki');
 }
 
 function config() {
@@ -53,12 +100,12 @@ function methodsFilterHandler() {
     const methodsFilter = document.getElementById('methodsFilter');
     const display = document.getElementById('display');
     const children = Array.from(display.childNodes);
-  
     children.forEach((child) => {
-      if (child.outerHTML === undefined) return;
-      const method = child.querySelector('.method').innerHTML.toLowerCase();
-      const shouldShow = method === methodsFilter.value.toLowerCase() || methodsFilter.value.toLowerCase() === 'all';
-      toggleHiddenClass(child, shouldShow);
+        if (child.outerHTML === undefined) return;
+        const method = child.querySelector('.method').innerHTML.toLowerCase();
+        const shouldShow = method === methodsFilter.value.toLowerCase() || methodsFilter.value.toLowerCase() === 'all';
+        toggleHiddenClass(child, shouldShow);
+
     });
 }
 
@@ -86,7 +133,7 @@ function toggleHiddenClass(element, shouldShow) {
         }
     }
 }
-  
+
 function flip(e) {
     for (const child of e.children) {
         child.classList.toggle('hidden');
@@ -116,22 +163,22 @@ function launch() {
 }
 
 function connect(host) {
-    let socket = new WebSocket(host);
+    socket = new WebSocket(host);
     socket.onopen = function (msg) {
         console.log("Connected to " + host);
     };
     socket.onmessage = function (msg) {
         const json = JSON.parse(msg.data);
-        if (json['protocol'] === 'http') {
+        if (json['type'] === 'http') {
             appendHTML(json);
-        } else if (json['protocol'] === 'rtmp') {
+        } else if (json['type'] === 'rtmp') {
             appendRTMP(json);
-        } else if (json['protocol'] === 'xmpp') {
+        } else if (json['type'] === 'xmpp') {
             appendXMPP(json);
-        } else if (json['protocol'] === 'rms') {
+        } else if (json['type'] === 'rms') {
             appendRMS(json);
         } else {
-            console.log("unknown protocol: " + json['protocol']);
+            console.log("unknown type: " + json['type']);
         }
         filter();
         methodsFilterHandler();
@@ -248,6 +295,18 @@ function content(value) {
             text.textContent = value;
             break
     }
+    text.onclick = function () {
+        if (text.textContent.trim().length === 0 || text.textContent === "Empty Body") {
+            return;
+        }
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(text);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        document.execCommand("copy");
+        selection.removeAllRanges();
+    }
     body.appendChild(text);
     center.appendChild(body);
     return center;
@@ -321,7 +380,7 @@ function appendJWTDecodeButton(parent, token) {
 
     jwtButton.onclick = function () {
         const isToggled = jwtButton.classList.contains("toggled");
-        
+
         if (isToggled) {
             jwtButton.classList.remove("toggled");
             const decodedJWTString = jwtButton.getAttribute("decodedJwt");
@@ -332,7 +391,7 @@ function appendJWTDecodeButton(parent, token) {
         } else {
             const decodedJWT = decodeJWT(token);
             const decodedJWTString = JSON.stringify(decodedJWT, null, 2);
-    
+
             jwtButton.setAttribute("originalJwt", token);
             jwtButton.setAttribute("decodedJwt", decodedJWTString);
             replaceTextContent(parent, token, decodedJWTString);
@@ -358,7 +417,7 @@ function replaceTextContent(element, searchText, replacementText) {
 function decodeJWT(token) {
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
 
@@ -393,7 +452,7 @@ function left(request) {
         header.className = "request-value";
         header.innerHTML = key + ": " + value;
 
-        JWTHandler(header ,value)
+        JWTHandler(header, value)
 
         headers.appendChild(header);
     }
@@ -416,7 +475,10 @@ function left(request) {
             break
     }
 
-    JWTHandler(text ,value)
+    if (value.length === 0) {
+        text.textContent = "Empty Body";
+    }
+    JWTHandler(text, value)
 
     body.appendChild(text);
     left.appendChild(body);
@@ -437,7 +499,7 @@ function right(response) {
         const header = document.createElement("div");
         header.className = "request-value";
 
-        JWTHandler(header ,value)
+        JWTHandler(header, value)
 
         header.innerHTML = key + ": " + value;
         headers.appendChild(header);
@@ -461,12 +523,16 @@ function right(response) {
             break
     }
 
-    JWTHandler(text ,value)
+    if (value.length === 0) {
+        text.textContent = "Empty Body";
+    }
+    JWTHandler(text, value)
 
     body.appendChild(text);
     right.appendChild(body);
     return right;
 }
+
 
 function expand() {
     const expand = document.createElement("div");

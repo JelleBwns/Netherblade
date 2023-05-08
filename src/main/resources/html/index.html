@@ -1,37 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <script crossorigin="anonymous" src="https://kit.fontawesome.com/1d7514c551.js"></script>
-    <link href="assets/styles/main.css" rel="stylesheet">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script
+            src="https://kit.fontawesome.com/1d7514c551.js"
+            crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="assets/styles/main.css"/>
     <script src="assets/scripts/main.js"></script>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+            crossorigin="anonymous"
+    />
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+            crossorigin="anonymous"
+    ></script>
     <title>Netherblade</title>
 </head>
 <body>
-<div class="stack-vertical">
-    <div class="header-fixed">
-        <div class="header">
-            <select class="methodsFilter" id="methodsFilter" name="methodsFilter">
-                <option value="ALL" title="ALL">ALL</option>
-                <option value="GET" title="GET">GET</option>
-                <option value="PUT" title="PUT">PUT</option>
-                <option value="POST" title="POST">POST</option>
-                <option value="RMS" title="RMS">RMS</option>
-                <option value="XMPP" title="XMPP">XMPP</option>
-                <option value="RTMP" title="RTMP">RTMP</option>
-            </select>
-            <input class="search-filter" id="search" placeholder="search keyword" type="text">
-            <select class="region" id="regions" name="regions"></select>
-            <button class="launcher ui-button medium" onclick="launch()">Launch Client</button>
-            <button class="reload ui-button big" onclick="config()">Reload Config</button>
-            <button class="close ui-button medium" onclick="wipe()">Reset UI</button>
-            <button class="close ui-button tiny" onclick="dispose()">X</button>
+<nav
+        class="navbar navbar-expand-lg shadow" id="inting">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAF8WlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDggNzkuMTY0MDM2LCAyMDE5LzA4LzEzLTAxOjA2OjU3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjEuMCAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIyLTA3LTMxVDAwOjE2OjI2KzAyOjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDIyLTA3LTMxVDAwOjE2OjI2KzAyOjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMi0wNy0zMVQwMDoxNjoyNiswMjowMCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpiMmQ2NDEwZC02OTVjLTQyNGEtODA2MC1iZDlhYmQ4ODUyZmYiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDoyYTc0ZTEwZS0yZDg0LTgwNGEtYjcwNC1lOTE0NTRhOGEwY2YiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpjZTZhOTg3Mi01Y2M1LTA0NDgtYjc2Yi0yZjEwZGEzOWU2ZTkiIGRjOmZvcm1hdD0iaW1hZ2UvcG5nIiBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIiBwaG90b3Nob3A6SUNDUHJvZmlsZT0ic1JHQiBJRUM2MTk2Ni0yLjEiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOmNlNmE5ODcyLTVjYzUtMDQ0OC1iNzZiLTJmMTBkYTM5ZTZlOSIgc3RFdnQ6d2hlbj0iMjAyMi0wNy0zMVQwMDoxNjoyNiswMjowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIxLjAgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpiMmQ2NDEwZC02OTVjLTQyNGEtODA2MC1iZDlhYmQ4ODUyZmYiIHN0RXZ0OndoZW49IjIwMjItMDctMzFUMDA6MTY6MjYrMDI6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyMS4wIChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8L3JkZjpTZXE+IDwveG1wTU06SGlzdG9yeT4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7CVItcAAAdU0lEQVRogYV6aXBk13Xed8697/WC3oDBPhhgVg6Gs3FIDoeLxJ0UqcW0FsqSlZLjuFIS4yRlO64kqqSspFJWVJFUcqyKKFUkpyLFkmxZiy1RC0lJNEkNl+E6nIWcHZgBZjAAGo3e33LPyY/X3QNSrOQWqqvRjUZ/37ln+c65lxgEAIBCARAIABExMQDLxoCTP0heASAqQgpAhBVCcAKIiqoCUFWizj8xZHw2howxKQOrKlnPm0j1OY0W2q1QXIA4cM4JRF33W4yoYzKW2GeTsRkD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"
+                    alt="HAWOLT ALLA"
+                    width="32"
+                    height="32"
+            />
+            Netherblade
+        </a>
+        <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav column-gap-3 grid gap-0 flexing meow">
+                <div id="spacing" class="spacing"></div>
+                <button
+                        type="submit"
+                        title="Clear all UI elements"
+                        class="close ui-button btn btn-warning text-nowrap"
+                        onclick="wipe()"
+                >
+                    <i class="fa-solid fa-eraser"></i>
+                </button>
+                <input
+                        id="search"
+                        class="search-filter form-control me-2 searchinghelp text-nowrap"
+                        type="text"
+                        placeholder="search keyword"
+                />
+                <select class="methodsFilter btn btn-light a-WHIFF text-nowrap" id="methodsFilter" name="methodsFilter">
+                    <option value="ALL" title="ALL">ALL</option>
+                    <option value="GET" title="GET">GET</option>
+                    <option value="PUT" title="PUT">PUT</option>
+                    <option value="POST" title="POST">POST</option>
+                    <option value="RMS" title="RMS">RMS</option>
+                    <option value="XMPP" title="XMPP">XMPP</option>
+                    <option value="RTMP" title="RTMP">RTMP</option>
+                </select>
+                <button
+                        type="submit"
+                        title="Force reload instructions"
+                        class="reload ui-button btn btn-secondary a-WHIFF text-nowrap"
+                        onclick="config()"
+                >
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+                <select
+                        class="region btn btn-light a-WHIFF text-nowrap"
+                        name="regions"
+                        id="regions"
+                ></select>
+                <button
+                        type="submit"
+                        title="Launch a Client with the selected Region"
+                        class="launcher ui-button btn btn-primary a-WHIFF text-nowrap"
+                        onclick="launch()"
+                >
+                    <i class="fa-solid fa-rocket"></i>
+                </button>
+                <button
+                        type="submit"
+                        title="Open Wiki"
+                        class="wiki ui-button btn btn-secondary a-WHIFF text-nowrap"
+                        onclick="wiki()"
+                >
+                    <i class="fa-brands fa-wikipedia-w"></i>
+                </button>
+                <button
+                        type="submit"
+                        title="Minimize"
+                        class="close ui-button btn btn-danger a-WHIFF text-nowrap"
+                        onclick="minimize()"
+                >
+                    <i class="fa-solid fa-window-minimize"></i>
+                </button>
+                <button
+                        type="submit"
+                        title="Maximize"
+                        class="close ui-button btn btn-danger a-WHIFF text-nowrap"
+                        onclick="maximize()"
+                >
+                    <i class="fa-regular fa-window-maximize"></i>
+                </button>
+                <button
+                        type="submit"
+                        title="Exit"
+                        class="close ui-button btn btn-danger a-WHIFF text-nowrap"
+                        onclick="dispose()"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
         </div>
     </div>
-
-    <div class="display" id="display">
-    </div>
+</nav>
+<div id="topelement">
+    <div id="display" class="main"></div>
+    <div id="display" class="mitm"></div>
 </div>
 </body>
 </html>
