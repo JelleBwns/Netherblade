@@ -10,6 +10,7 @@ import com.hawolt.mitm.impl.ResponseModule;
 import com.hawolt.mitm.rule.impl.BodyRewriteRule;
 import com.hawolt.mitm.rule.impl.CodeRewriteRule;
 import com.hawolt.mitm.rule.impl.HeaderRewriteRule;
+import com.hawolt.ui.SocketServer;
 import com.hawolt.util.RunLevel;
 import io.javalin.http.Handler;
 import org.json.JSONArray;
@@ -17,6 +18,7 @@ import org.json.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +49,7 @@ public class RuleInterpreter {
         try {
             String filename = file == null ? "instructions.json" : file;
             JSONObject object = new JSONObject(Core.read(Core.getFileAsStream(Paths.get(filename))).toString());
+            SocketServer.forward(new JSONObject().put("type", "rule").put("data", object).toString());
             for (String first : object.keySet()) {
                 CommunicationType communicationType = CommunicationType.find(first);
                 if (communicationType == CommunicationType.UNKNOWN) continue;
