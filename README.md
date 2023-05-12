@@ -16,12 +16,13 @@ allows you to see what actually happens and modifiy it on the get go, supprting 
 4. Make sure you are actually using a compatible Java version by selecting `File` -> `Project Structure`, navigate to `Project` within `Project Settings` and make sure both `SDK` and `Language level`have any Java version between 8 and 16 selected, hit `OK`
 5. To run the Code navigate to `src/main/java/com/hawolt` and rightclick `Main`, select `Run Main.main()`
 
-### Discord
+## Wiki
+
+if you are still hungry for more, feel free to checkout the Wiki
+
+* [Man in the Middle](https://github.com/Riotphobia/Netherblade/wiki/Man-in-the-Middle) (WIP)
+* [NetherScript](https://github.com/Riotphobia/Netherblade/wiki/NetherScript)
+
+## Discord
 
 Join the Riotphobia [discord](https://discord.gg/JRDwxFxW7m) to stay up to date with Netherblade and its development
-
----
-
-### Running the project
-
-either build it yourself or head to the release section and download the latest precompiled version
