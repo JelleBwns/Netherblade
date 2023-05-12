@@ -2,6 +2,7 @@ package com.hawolt.mitm.rule.impl;
 
 import com.hawolt.logger.Logger;
 import com.hawolt.mitm.cache.InternalStorage;
+import com.hawolt.mitm.interpreter.CommandInterpreter;
 import com.hawolt.mitm.rule.AbstractRewriteRule;
 import com.hawolt.mitm.rule.Replacement;
 import com.hawolt.mitm.rule.ReplacementGroup;
@@ -38,7 +39,7 @@ public class BodyRewriteRule extends AbstractRewriteRule<String, String> {
                     this.key = object.getInt("key");
                     this.value = object.getInt("value");
                     this.prefix = object.getString("prefix");
-                } else if (getType() == RuleType.REGEX) {
+                } else if (getType() == RuleType.REGEX || getType() == RuleType.NETHERSCRIPT) {
                     this.groups = object.getJSONArray("groups")
                             .toList()
                             .stream()
@@ -81,6 +82,7 @@ public class BodyRewriteRule extends AbstractRewriteRule<String, String> {
                 modified = in.replaceAll(plain, replacement);
                 Logger.debug("[{}-RULE] {} -> {}", type.name(), plain, getReplacement());
                 break;
+            case NETHERSCRIPT:
             case REGEX:
                 matcher = pattern.matcher(in);
                 builder = new StringBuilder(in);
@@ -99,8 +101,20 @@ public class BodyRewriteRule extends AbstractRewriteRule<String, String> {
                 for (int i = list.size() - 1; i >= 0; i--) {
                     Replacement rule = list.get(i);
                     String target = builder.substring(rule.getStart(), rule.getEnd());
-                    builder.replace(rule.getStart(), rule.getEnd(), rule.getReplacement());
-                    Logger.info("[REWRITE] {}:{} -> {}", i, target, rule.getReplacement());
+                    if (type == RuleType.REGEX) {
+                        builder.replace(rule.getStart(), rule.getEnd(), rule.getReplacement());
+                        Logger.info("[REWRITE] {}:{} -> {}", i, target, rule.getReplacement());
+                    } else {
+                        String source = builder.substring(rule.getStart(), rule.getEnd());
+                        try {
+                            String replacement = CommandInterpreter.parse(String.format(rule.getReplacement(), source));
+                            builder.replace(rule.getStart(), rule.getEnd(), replacement);
+                            Logger.info("[REWRITE-NETHERSCRIPT] {}:{} -> {}", i, target, replacement);
+                        } catch (Exception e) {
+                            Logger.fatal(e.getMessage());
+                            Logger.error("[REWRITE-NETHERSCRIPT] {}:{} -> {}", i, target, rule.getReplacement());
+                        }
+                    }
                 }
                 in = builder.toString();
                 Logger.debug("[{}-RULE] {}:{} -> {}", type.name(), plain, target, getReplacement());
