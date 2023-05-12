@@ -49,8 +49,9 @@ public class RmsSocketProxy extends DataSocketProxy<WebsocketFrame> {
     }
 
     private void handle(boolean in, WebsocketFrame frame) throws IOException {
+        if (frame.getOpCode() != 4) return;
         String message;
-        if (Base64GZIP.isGzip(frame.getPayload())) {
+        if (frame.getPayload().length >= 2 && Base64GZIP.isGzip(frame.getPayload())) {
             try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(frame.getPayload()))) {
                 message = Core.read(gis).toString();
             }
@@ -59,11 +60,10 @@ public class RmsSocketProxy extends DataSocketProxy<WebsocketFrame> {
         }
         JSONObject object = new JSONObject().put("type", "rms");
         SocketServer.forward(object.put(in ? "in" : "out", new JSONObject(message)).toString());
-        Logger.error("[rms] {} {}", in ? "<" : ">", message);
+        Logger.debug("[rms] {} {}", in ? "<" : ">", message);
     }
 
     private void handle(boolean in, byte[] b) {
-        Logger.error("IN: {}, DATA: {}", in, ByteMagic.toHex(b));
         String hash = hash(b);
         String raw = new String(b);
         if (cache.contains(hash) || raw.contains("HTTP") || transformer == null) return;
