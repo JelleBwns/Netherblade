@@ -130,6 +130,86 @@
         ]
       },
       {
+        "method": "*",
+        "url": "https://clientconfig.rpg.riotgames.com(.*)",
+        "find": "\"lol\\.game_client_settings\\.redge_urls\\.public\":((\\{\\s*)[\\s\\S]*?(?=(}))}),",
+        "type": "netherscript",
+        "groups": [
+          {
+            "id": [
+              1
+            ],
+            "replace": "$(replace $(var loadouts) $(var proxy) $(var json)$(declare proxy $(proxy ledge $(var loadouts $(declare loadouts $(jsonobject loadouts $(var json $(declare json %s))))))))"
+          },
+          {
+            "id": [
+              1
+            ],
+            "replace": "$(replace $(var login-queue) $(var proxy) $(var json)$(declare proxy $(proxy queue $(var login-queue $(declare login-queue $(jsonobject login-queue $(var json $(declare json %s))))))))"
+          },
+          {
+            "id": [
+              1
+            ],
+            "replace": "$(replace $(var match-history-query) $(var proxy) $(var json)$(declare proxy $(proxy platform $(var match-history-query $(declare match-history-query $(jsonobject match-history-query $(var json $(declare json %s))))))))"
+          },
+          {
+            "id": [
+              1
+            ],
+            "replace": "$(replace $(var services) $(var proxy) $(var json)$(declare proxy $(proxy ledge $(var services $(declare services $(jsonobject services $(var json $(declare json %s))))))))"
+          },
+          {
+            "id": [
+              1
+            ],
+            "replace": "$(replace $(var session-external) $(var proxy) $(var json)$(declare proxy $(proxy platform $(var session-external $(declare session-external $(jsonobject session-external $(var json $(declare json %s))))))))"
+          }
+        ]
+      },
+      {
+        "method": "*",
+        "url": "https://clientconfig.rpg.riotgames.com(.*)",
+        "find": "\"lol\\.(game_client|client)_settings\\.league_edge\\.url\":\"(.*?)\",",
+        "type": "netherscript",
+        "groups": [
+          {
+            "id": [
+              2
+            ],
+            "replace": "$(proxy ledge %s)"
+          }
+        ]
+      },
+      {
+        "method": "*",
+        "url": "https://clientconfig.rpg.riotgames.com(.*)",
+        "find": "\"lol\\.(game_client|client)_settings\\.player_platform_edge\\.url\":\"(.*?)\",",
+        "type": "netherscript",
+        "groups": [
+          {
+            "id": [
+              2
+            ],
+            "replace": "$(proxy platform %s)"
+          }
+        ]
+      },
+      {
+        "method": "*",
+        "url": "https://clientconfig.rpg.riotgames.com(.*)",
+        "find": "\"keystone\\.player-affinity\\.playerAffinityServiceURL\":\"(.*?)\",",
+        "type": "netherscript",
+        "groups": [
+          {
+            "id": [
+              1
+            ],
+            "replace": "$(proxy geo %s)"
+          }
+        ]
+      },
+      {
         "method": "OPTIONS",
         "url": "(.*)",
         "find": "(.*)",
