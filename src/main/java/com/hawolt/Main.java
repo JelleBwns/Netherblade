@@ -4,6 +4,7 @@ import com.hawolt.http.LocalExecutor;
 import com.hawolt.logger.Logger;
 import com.hawolt.mitm.cache.InternalStorage;
 import com.hawolt.mitm.rule.RuleInterpreter;
+import com.hawolt.socket.DataSocketProxy;
 import com.hawolt.socket.rms.RmsSocketProxy;
 import com.hawolt.socket.rms.WebsocketFrame;
 import com.hawolt.socket.rtmp.RtmpSocketProxy;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,7 +28,8 @@ import java.util.Map;
  **/
 
 public class Main {
-    public static RmsSocketProxy proxy;
+    public static Map<String, DataSocketProxy<?>> rtmp = new HashMap<>();
+    public static DataSocketProxy<?> rms, xmpp;
 
     public static void main(String[] args) {
         String version = System.getProperty("java.version");
@@ -61,17 +64,18 @@ public class Main {
             //TODO experimental
             for (Map.Entry<Integer, String> entry : SystemYaml.map.entrySet()) {
                 Logger.debug("[rtmp] setting up proxy on port {} for {}", entry.getKey(), entry.getValue());
-                RtmpSocketProxy proxy = new RtmpSocketProxy(entry.getValue(), 2099, entry.getKey(), null);
-                proxy.start();
+                RtmpSocketProxy rtmp = new RtmpSocketProxy(entry.getValue(), 2099, entry.getKey(), null);
+                Main.rtmp.put(entry.getValue(), rtmp);
+                rtmp.start();
             }
             //TODO experimental
-            InternalStorage.registerStorageListener(false, "rmstoken", rmstoken -> {
+            InternalStorage.registerStorageListener(true, "rmstoken", rmstoken -> {
                 JSONObject object = new JSONObject(new String(Base64.getDecoder().decode(rmstoken.split("\\.")[1])));
                 String affinity = object.getString("affinity");
                 InternalStorage.registerStorageListener(false, String.join("-", "rms", affinity), host -> {
                     Logger.debug("[rms] setting up proxy on port {} for {}", 11443, host);
-                    proxy = new RmsSocketProxy(host, 443, 11443, WebsocketFrame::new);
-                    proxy.start();
+                    rms = new RmsSocketProxy(host, 443, 11443, WebsocketFrame::new);
+                    rms.start();
                 });
             });
             //TODO experimental
@@ -80,8 +84,8 @@ public class Main {
                 String affinity = object.getString("affinity");
                 InternalStorage.registerStorageListener(false, String.join("-", "xmpp", affinity), host -> {
                     Logger.debug("[xmpp] setting up proxy on port {} for {}", 5223, host);
-                    XmppSocketProxy proxy = new XmppSocketProxy(host, 5223, 5223, String::new);
-                    proxy.start();
+                    xmpp = new XmppSocketProxy(host, 5223, 5223, String::new);
+                    xmpp.start();
                 });
             });
         } catch (IOException e) {

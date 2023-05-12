@@ -16,7 +16,7 @@ import java.util.*;
 public class BasicProxyServer {
     private final Map<String, List<IRequestModifier>> map = new HashMap<>();
 
-    private final String target;
+    private String target;
 
     public BasicProxyServer(int port, String target) {
         this.target = target;
@@ -93,5 +93,9 @@ public class BasicProxyServer {
                 map.get(method).add(modifier);
             }
         }
+    }
+
+    public void proxy(String target) {
+        this.target = target;
     }
 }

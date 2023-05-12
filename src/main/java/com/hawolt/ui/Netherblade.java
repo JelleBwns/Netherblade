@@ -47,7 +47,6 @@ public class Netherblade {
 
     public static void create() throws IOException {
         JFrame frame = new JFrame();
-        frame.setUndecorated(true);
         String icon = "netherblade.png";
         frame.setIconImage(ImageIO.read(RunLevel.get(icon)));
         frame.setTitle("Netherblade");
@@ -70,11 +69,14 @@ public class Netherblade {
         Path path = Paths.get(System.getProperty("java.io.tmpdir")).resolve("jcef-bundle");
         try {
             Chromium chromium = new Chromium("http://127.0.0.1:35199", path, handler);
+            frame.dispose();
+            frame.setUndecorated(true);
             container.removeAll();
             container.setPreferredSize(new Dimension(1000, 620));
             container.add(chromium.getBrowserUI(), BorderLayout.CENTER);
             frame.pack();
             frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
         } catch (UnsupportedPlatformException | CefInitializationException | IOException | InterruptedException e) {
             Logger.error(e);
         }

@@ -1,12 +1,10 @@
 package com.hawolt.http;
 
-import com.hawolt.Main;
 import com.hawolt.http.proxy.BasicProxyServer;
 import com.hawolt.http.proxy.ProxyRequest;
 import com.hawolt.http.proxy.ProxyResponse;
 import com.hawolt.logger.Logger;
 import com.hawolt.mitm.CommunicationType;
-import com.hawolt.mitm.InstructionType;
 import com.hawolt.mitm.Unsafe;
 import com.hawolt.mitm.rule.RuleInterpreter;
 import com.hawolt.ui.Netherblade;
@@ -18,21 +16,11 @@ import com.hawolt.yaml.SystemYaml;
 import io.javalin.http.Handler;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import sun.nio.ch.Net;
 
-import javax.swing.*;
-import javax.xml.bind.DatatypeConverter;
-import java.awt.*;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.path;
@@ -44,6 +32,7 @@ import static io.javalin.apibuilder.ApiBuilder.path;
  **/
 
 public class LocalExecutor {
+    private static final Map<String, BasicProxyServer> map = new HashMap<>();
 
     private static final Handler AVAILABLE = context -> {
         JSONObject object = new JSONObject();
@@ -64,45 +53,18 @@ public class LocalExecutor {
         } catch (IOException e) {
             Logger.error(e);
         }
-        Map<String, BasicProxyServer> map = new HashMap<>();
-        JSONObject system = SystemYaml.config.getJSONObject(context.pathParam("region"));
-        map.put("config", new BasicProxyServer(StaticConstants.PORT_MAPPING.get("config"), system.getString("config")));
-        for (String type : system.keySet()) {
-            if (type.equalsIgnoreCase("config")) continue;
-            map.put(type, new BasicProxyServer(StaticConstants.PORT_MAPPING.get(type), system.getString(type)));
-            Logger.debug("Proxy {}:{} on {}:{}", type.toUpperCase(), system.getString(type), "http://127.0.0.1", StaticConstants.PORT_MAPPING.get(type));
-        }
+        register("entitlement", "https://entitlements.auth.riotgames.com/api/token/v1");
+        register("email", "https://email-verification.riotgames.com/api");
+        register("config", "https://clientconfig.rpg.riotgames.com");
+        register("geo", "https://riot-geo.pas.si.riotgames.com");
+    };
 
-        map.get("config").register(new IRequestModifier() {
-            @Override
-            public ProxyRequest onBeforeRequest(ProxyRequest o) {
-                return Unsafe.cast(RuleInterpreter.map.get(CommunicationType.OUTGOING).rewrite(Unsafe.cast(o)));
-            }
-
-            @Override
-            public ProxyResponse onResponse(ProxyResponse o) {
-                ProxyResponse response = Unsafe.cast(RuleInterpreter.map.get(CommunicationType.INGOING).rewrite(Unsafe.cast(o)));
-                String plain = new String(response.getByteBody());
-                for (String type : system.keySet()) {
-                    String target = system.getString(type);
-                    String replacement = String.format("http://127.0.0.1:%d", StaticConstants.PORT_MAPPING.get(type));
-                    plain = plain.replaceAll(target, replacement);
-                    Logger.debug("Rewriting {} to {} in request {}", target, replacement, o.getOriginal().getUrl());
-                }
-                //Logger.debug(plain);
-                o.setBody(plain.getBytes(StandardCharsets.UTF_8));
-                return o;
-            }
-
-            @Override
-            public void onException(Exception e) {
-                Logger.error(e);
-            }
-        }, SUPPORTED);
-
-
-        for (String key : map.keySet()) {
-            BasicProxyServer server = map.get(key);
+    public static void register(String type, String target) {
+        if (map.containsKey(type)) {
+            map.get(type).proxy(target);
+        } else {
+            BasicProxyServer server = new BasicProxyServer(StaticConstants.PORT_MAPPING.get(type), target);
+            map.put(type, server);
             server.register(new IRequestModifier() {
                 @Override
                 public ProxyRequest onBeforeRequest(ProxyRequest o) {
@@ -170,7 +132,7 @@ public class LocalExecutor {
                 }
             }, SUPPORTED);
         }
-    };
+    }
 
 
     public static void configure() {
