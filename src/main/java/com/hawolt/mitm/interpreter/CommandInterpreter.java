@@ -1,5 +1,6 @@
 package com.hawolt.mitm.interpreter;
 
+import com.hawolt.logger.Logger;
 import com.hawolt.mitm.interpreter.impl.*;
 
 import java.util.Arrays;
@@ -12,8 +13,10 @@ public class CommandInterpreter {
 
     static {
         INSTRUCTION_MAP.put("jsonobject", new JSONObjectInstruction());
+        INSTRUCTION_MAP.put("replace", new ReplaceStringInstruction());
         INSTRUCTION_MAP.put("strlen", new StringLengthInstruction());
         INSTRUCTION_MAP.put("substring", new SubstringInstruction());
+        INSTRUCTION_MAP.put("proxy", new SetupProxyInstruction());
         INSTRUCTION_MAP.put("mint", new IntegerMathInstruction());
         INSTRUCTION_MAP.put("declare", new DeclareInstruction());
         INSTRUCTION_MAP.put("var", new VariableInstruction());
@@ -35,6 +38,7 @@ public class CommandInterpreter {
         Map<String, String> map = new HashMap<>();
         if (port != null) map.put("port", port);
         for (int i = occurrences.length - 1; i >= 0; i--) {
+            Logger.debug("[NETHERSCRIPT-PARSER] {}", builder.toString());
             int start = builder.indexOf("(", occurrences[i] + 1);
             if (start == -1) continue;
             int end = builder.indexOf(")", start);
@@ -45,10 +49,15 @@ public class CommandInterpreter {
                 String result = instruction.manipulate(args);
                 if (instruction instanceof VariableInstruction) {
                     boolean available = map.containsKey(args[1]);
-                    if (!available) continue;
+                    if (!available) {
+                        Logger.debug("[NETHERSCRIPT-PARSER] ATTEMPTED TO FETCH NON-EXISTING VAR {}", args[1]);
+                        continue;
+                    }
+                    Logger.debug("[NETHERSCRIPT-PARSER] FETCH VAR {} AS {}", args[1], map.get(args[1]));
                     builder.replace(occurrences[i], end + 1, map.get(args[1]));
                 } else if (instruction instanceof DeclareInstruction) {
                     String[] variable = result.split(" ", 2);
+                    Logger.debug("[NETHERSCRIPT-PARSER] DECLARE VAR {} AS {}", variable[0], variable[1]);
                     map.put(variable[0], variable[1]);
                     builder.replace(occurrences[i], end + 1, "");
                 } else {
@@ -56,6 +65,7 @@ public class CommandInterpreter {
                 }
             }
         }
+        Logger.debug("[NETHERSCRIPT-PARSER] RETURN {}", builder.toString());
         return builder.toString().trim();
     }
 }
