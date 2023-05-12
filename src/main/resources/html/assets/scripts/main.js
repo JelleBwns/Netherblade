@@ -223,7 +223,7 @@ function hintSpecial(name, ingoing, value) {
     uri.className = "uri";
     switch (name) {
         case "RMS":
-            let resource = value['payload'].hasOwnProperty("resource");
+            let resource = value.hasOwnProperty('payload') && value['payload'].hasOwnProperty("resource");
             uri.innerHTML = resource ? value['subject'] + " " + value['payload']['resource'] : value['subject'];
             break;
         case "XMPP":
