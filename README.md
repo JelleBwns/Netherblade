@@ -1,21 +1,24 @@
 # Netherblade
 
-Netherblade allows you to look behind the curtain and see requests executed by the LCU layer of the Client, additionally
-Netherblade can perform Man in the Middle to adjust the Requests and Responses as needed.
+allows you to see what actually happens and modifiy it on the get go, supprting `rtmp`, `xmpp` and `rms` protocol used by the Client
 
-## Preview
-
-currently Netherblade is able to intercept almost all traffic issued by the League Client
-
-![preview](https://i.imgur.com/zwgfWvb.png)
-
-### Discord
-
-Join the Riotphobia [discord](https://discord.gg/JRDwxFxW7m) to stay up to date with Netherblade
+![preview](https://i.postimg.cc/QCjtyxsd/Untitled2.png)
 
 ### software requirements
 
-* java 8 upto java 16, anything higher will not work
+* java 8 upto java 16, anything higher will not work and Netherblade will refuse to start
+
+## How to setup the project using IntelliJ
+
+1. within Intellij select `File` -> `New` -> `Project from Version Control...`
+2. insert `git@github.com:Riotphobia/Netherblade.git` for the `URL` field and hit `Clone`
+3. IntelliJ should automatically detect the Maven framework, if this is not the case you can rightclick the Netherblade folder in the Project hierarchy and select `Add Framework Support...` then select `Maven`
+4. Make sure you are actually using a compatible Java version by selecting `File` -> `Project Structure`, navigate to `Project` within `Project Settings` and make sure both `SDK` and `Language level`have any Java version between 8 and 16 selected, hit `OK`
+5. To run the Code navigate to `src/main/java/com/hawolt` and rightclick `Main`, select `Run Main.main()`
+
+### Discord
+
+Join the Riotphobia [discord](https://discord.gg/JRDwxFxW7m) to stay up to date with Netherblade and its development
 
 ---
 
