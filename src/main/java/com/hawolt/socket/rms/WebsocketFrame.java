@@ -97,4 +97,12 @@ public class WebsocketFrame {
         return Arrays.copyOfRange(b, startIndex + length, b.length);
     }
 
+    @Override
+    public String toString() {
+        return "WebsocketFrame{" +
+                "length=" + length +
+                ", startIndex=" + startIndex +
+                ", payload=" + new String(getPayload()) +
+                '}';
+    }
 }

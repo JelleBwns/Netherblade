@@ -1,6 +1,7 @@
 package com.hawolt.mitm.rule.impl;
 
 import com.hawolt.logger.Logger;
+import com.hawolt.mitm.rule.AbstractHttpRewriteRule;
 import com.hawolt.mitm.rule.AbstractRewriteRule;
 import org.json.JSONObject;
 
@@ -9,7 +10,7 @@ import org.json.JSONObject;
  * Author: Twitter @hawolt
  **/
 
-public class CodeRewriteRule extends AbstractRewriteRule<Integer, Integer> {
+public class CodeRewriteRule extends AbstractHttpRewriteRule<Integer, Integer> {
     private final int code;
 
     public CodeRewriteRule(JSONObject o) {

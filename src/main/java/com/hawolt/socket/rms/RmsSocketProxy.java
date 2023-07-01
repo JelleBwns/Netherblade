@@ -2,7 +2,11 @@ package com.hawolt.socket.rms;
 
 import com.hawolt.io.Core;
 import com.hawolt.logger.Logger;
+import com.hawolt.mitm.CommunicationType;
+import com.hawolt.mitm.Unsafe;
 import com.hawolt.mitm.rtmp.ByteMagic;
+import com.hawolt.mitm.rule.FrameAction;
+import com.hawolt.mitm.rule.RuleInterpreter;
 import com.hawolt.rtmp.utility.Base64GZIP;
 import com.hawolt.socket.DataSocketProxy;
 import com.hawolt.socket.SocketInterceptor;
@@ -48,42 +52,50 @@ public class RmsSocketProxy extends DataSocketProxy<WebsocketFrame> {
         });
     }
 
-    private void handle(boolean in, WebsocketFrame frame) throws IOException {
-        if (frame.getOpCode() != 4) return;
+    private FrameAction handle(boolean in, WebsocketFrame frame) throws IOException {
+        if (frame.getOpCode() != 4) return FrameAction.DROP;
+        CommunicationType type = in ? CommunicationType.INGOING : CommunicationType.OUTGOING;
+        WebsocketFrame modified = Unsafe.cast(RuleInterpreter.map.get(type).rewriteRMS(frame));
+        if (modified == null) {
+            Logger.error("[rms] drop: {}", frame);
+            return FrameAction.DROP;
+        }
         String message;
-        if (frame.getPayload().length >= 2 && Base64GZIP.isGzip(frame.getPayload())) {
-            try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(frame.getPayload()))) {
+        if (modified.getPayload().length >= 2 && Base64GZIP.isGzip(modified.getPayload())) {
+            try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(modified.getPayload()))) {
                 message = Core.read(gis).toString();
             }
         } else {
-            message = new String(frame.getPayload());
+            message = new String(modified.getPayload());
         }
         JSONObject object = new JSONObject().put("type", "rms");
         SocketServer.forward(object.put(in ? "in" : "out", new JSONObject(message)).toString());
         Logger.debug("[rms] {} {}", in ? "<" : ">", message);
+        return FrameAction.FORWARD;
     }
 
-    private void handle(boolean in, byte[] b) {
+    private byte[] handle(boolean in, byte[] b) {
         String hash = hash(b);
         String raw = new String(b);
-        if (cache.contains(hash) || raw.contains("HTTP") || transformer == null) return;
+        if (cache.contains(hash) || raw.contains("HTTP") || transformer == null) return b;
         else cache.add(hash);
         WebsocketFrame frame = transformer.apply(b);
+        List<FrameAction> list = new ArrayList<>();
         try {
-            handle(in, frame);
+            list.add(handle(in, frame));
             while (frame.isMultiFrame()) {
                 frame = new WebsocketFrame(frame.getOverhead());
-                handle(in, frame);
+                list.add(handle(in, frame));
             }
         } catch (Exception e) {
             Logger.error(e);
         }
+        return list.contains(FrameAction.DROP) ? null : b;
     }
 
     @Override
     public byte[] onServerData(byte[] b) {
-        handle(true, b);
-        return b;
+        return handle(true, b);
     }
 
     @Override

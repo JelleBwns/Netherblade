@@ -3,10 +3,7 @@ package com.hawolt.mitm.rule.impl;
 import com.hawolt.logger.Logger;
 import com.hawolt.mitm.cache.InternalStorage;
 import com.hawolt.mitm.interpreter.CommandInterpreter;
-import com.hawolt.mitm.rule.AbstractRewriteRule;
-import com.hawolt.mitm.rule.Replacement;
-import com.hawolt.mitm.rule.ReplacementGroup;
-import com.hawolt.mitm.rule.RuleType;
+import com.hawolt.mitm.rule.*;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -21,7 +18,7 @@ import java.util.stream.Collectors;
  * Author: Twitter @hawolt
  **/
 
-public class BodyRewriteRule extends AbstractRewriteRule<String, String> {
+public class BodyRewriteRule extends AbstractHttpRewriteRule<String, String> {
     private String replacement, plain, name, prefix;
     private List<ReplacementGroup> groups;
     private Pattern pattern;

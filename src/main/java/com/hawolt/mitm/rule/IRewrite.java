@@ -1,6 +1,6 @@
 package com.hawolt.mitm.rule;
 
-import java.util.regex.Pattern;
+import com.hawolt.http.proxy.IRequest;
 
 /**
  * Created: 22/11/2022 04:24
@@ -10,9 +10,7 @@ import java.util.regex.Pattern;
 public interface IRewrite<T, S> {
     S rewrite(T in);
 
-    Pattern getTarget();
-
-    String getMethod();
-
     RuleType getType();
+
+    boolean isTargeted(IRequest request);
 }

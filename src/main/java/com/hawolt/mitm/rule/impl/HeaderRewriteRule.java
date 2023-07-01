@@ -2,6 +2,7 @@ package com.hawolt.mitm.rule.impl;
 
 import com.hawolt.logger.Logger;
 import com.hawolt.mitm.interpreter.CommandInterpreter;
+import com.hawolt.mitm.rule.AbstractHttpRewriteRule;
 import com.hawolt.mitm.rule.AbstractRewriteRule;
 import com.hawolt.util.Pair;
 import org.json.JSONObject;
@@ -14,7 +15,7 @@ import java.util.Map;
  * Author: Twitter @hawolt
  **/
 
-public class HeaderRewriteRule extends AbstractRewriteRule<Map<String, List<String>>, Pair<String, String>> {
+public class HeaderRewriteRule extends AbstractHttpRewriteRule<Map<String, List<String>>, Pair<String, String>> {
     private final String key, value;
 
     public HeaderRewriteRule(JSONObject o) {
