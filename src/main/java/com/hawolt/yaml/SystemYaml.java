@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 public class SystemYaml {
     public static final Map<Integer, String> map = new HashMap<>();
 
+
     public static JSONObject config;
 
     static {
@@ -79,7 +80,7 @@ public class SystemYaml {
             int firstIndex = relay.indexOf(".");
             int secondIndex = relay.indexOf(".", firstIndex + 1);
             String region = relay.substring(firstIndex + 1, secondIndex);
-            relay = String.format("prod.%s.lol.riotgames.com", region);
+            relay = String.format("feapp.%s.lol.pvp.net", region);
             host.replace(indexOfHost, host.length(), "127.0.0.1");
             lines.set(i + 1, host.toString());
             StringBuilder port = new StringBuilder(lines.get(i + 2));
