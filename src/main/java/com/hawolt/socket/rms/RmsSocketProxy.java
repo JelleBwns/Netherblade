@@ -1,19 +1,16 @@
 package com.hawolt.socket.rms;
 
-import com.hawolt.io.Core;
 import com.hawolt.logger.Logger;
 import com.hawolt.mitm.CommunicationType;
 import com.hawolt.mitm.Unsafe;
 import com.hawolt.mitm.rtmp.ByteMagic;
 import com.hawolt.mitm.rule.FrameAction;
 import com.hawolt.mitm.rule.RuleInterpreter;
-import com.hawolt.rtmp.utility.Base64GZIP;
 import com.hawolt.socket.DataSocketProxy;
 import com.hawolt.socket.SocketInterceptor;
 import com.hawolt.ui.SocketServer;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -21,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.function.Function;
-import java.util.zip.GZIPInputStream;
 
 public class RmsSocketProxy extends DataSocketProxy<WebsocketFrame> {
     private final List<String> cache = new ArrayList<>();
@@ -60,14 +56,7 @@ public class RmsSocketProxy extends DataSocketProxy<WebsocketFrame> {
             Logger.error("[rms] drop: {}", frame);
             return FrameAction.DROP;
         }
-        String message;
-        if (modified.getPayload().length >= 2 && Base64GZIP.isGzip(modified.getPayload())) {
-            try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(modified.getPayload()))) {
-                message = Core.read(gis).toString();
-            }
-        } else {
-            message = new String(modified.getPayload());
-        }
+        String message = WebsocketFrame.getMessage(frame);
         JSONObject object = new JSONObject().put("type", "rms");
         SocketServer.forward(object.put(in ? "in" : "out", new JSONObject(message)).toString());
         Logger.debug("[rms] {} {}", in ? "<" : ">", message);
@@ -94,11 +83,6 @@ public class RmsSocketProxy extends DataSocketProxy<WebsocketFrame> {
     }
 
     @Override
-    public byte[] onServerData(byte[] b) {
-        return handle(true, b);
-    }
-
-    @Override
     public byte[] onApplicationData(byte[] b) {
         int index = ByteMagic.indexOf(b, localhost);
         byte[] data;
@@ -115,6 +99,12 @@ public class RmsSocketProxy extends DataSocketProxy<WebsocketFrame> {
         handle(false, data);
         return data;
     }
+
+    @Override
+    public byte[] onServerData(byte[] b) {
+        return handle(true, b);
+    }
+
 
     private String hash(byte[] b) {
         MessageDigest digest;
