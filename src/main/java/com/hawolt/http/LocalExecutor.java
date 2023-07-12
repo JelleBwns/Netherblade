@@ -37,6 +37,9 @@ public class LocalExecutor {
     private static final Handler AVAILABLE = context -> {
         JSONObject object = new JSONObject();
         JSONArray array = new JSONArray();
+        Logger.debug("system.yaml: {}", LocaleInstallation.SYSTEM_YAML);
+        Logger.debug("RiotClientServices: {}", LocaleInstallation.RIOT_CLIENT_SERVICES);
+        Logger.debug("file-content: system.yaml: {}", SystemYaml.config.toString());
         for (String region : SystemYaml.config.keySet()) {
             array.put(region);
         }
