@@ -8,6 +8,8 @@ import com.hawolt.mitm.rule.RuleType;
 import com.hawolt.mitm.rule.impl.BodyRewriteRule;
 import com.hawolt.mitm.rule.impl.CodeRewriteRule;
 import com.hawolt.mitm.rule.impl.HeaderRewriteRule;
+import com.hawolt.mitm.rule.impl.RiotMessagingServiceRule;
+import com.hawolt.socket.rms.WebsocketFrame;
 import com.hawolt.util.Pair;
 
 import java.util.HashMap;
@@ -25,26 +27,31 @@ public abstract class RewriteModule<T extends IRequest> {
     public void supply(Map<InstructionType, List<IRewrite<?, ?>>> map) {
         this.map.clear();
         for (InstructionType type : map.keySet()) {
-            for (IRewrite<?, ?> rule : map.get(type)) {
-                Logger.debug("RewriteModule [{}]: {} {}", type.name(), rule.getMethod(), rule.getTarget());
-            }
             Logger.debug("RewriteModule [{}]: {} rules loaded", type.name(), map.get(type).size());
         }
         this.map = map;
     }
 
     public void inject(InstructionType type, IRewrite<?, ?> rule) {
-        Logger.debug("RewriteModule [{}]: {} {}", type.name(), rule.getMethod(), rule.getTarget());
         Logger.debug("RewriteModule [{}]: rule injected", type.name());
         map.get(type).add(rule);
     }
 
+    public WebsocketFrame rewriteRMS(WebsocketFrame frame) {
+        List<IRewrite<?, ?>> rules = map.get(InstructionType.RMS);
+        for (IRewrite<?, ?> rule : rules) {
+            if (frame == null) continue;
+            frame = rewriteRMS(frame, Unsafe.cast(rule));
+        }
+        return frame;
+    }
+
     public T rewrite(T communication) {
         for (InstructionType type : map.keySet()) {
+            if (type == InstructionType.RMS) continue;
             List<IRewrite<?, ?>> rules = map.get(type);
             for (IRewrite<?, ?> rule : rules) {
-                if (!rule.getTarget().matcher(communication.url()).matches()) continue;
-                if (!rule.getMethod().equals(communication.method()) && !rule.getMethod().equals("*")) continue;
+                if (!rule.isTargeted(communication)) continue;
                 Logger.debug("Matching url for {} rule [{}] {} ", type.name(), communication.method(), communication.url());
                 switch (type) {
                     case CODE:
@@ -66,6 +73,10 @@ public abstract class RewriteModule<T extends IRequest> {
             }
         }
         return communication;
+    }
+
+    private WebsocketFrame rewriteRMS(WebsocketFrame communication, RiotMessagingServiceRule rule) {
+        return rule.rewrite(communication);
     }
 
     private T rewriteBody(T communication, BodyRewriteRule rule) {

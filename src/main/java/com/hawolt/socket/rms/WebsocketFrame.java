@@ -1,8 +1,13 @@
 package com.hawolt.socket.rms;
 
+import com.hawolt.io.Core;
 import com.hawolt.mitm.rtmp.ByteMagic;
+import com.hawolt.rtmp.utility.Base64GZIP;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.zip.GZIPInputStream;
 
 public class WebsocketFrame {
     private final byte[] b;
@@ -97,4 +102,24 @@ public class WebsocketFrame {
         return Arrays.copyOfRange(b, startIndex + length, b.length);
     }
 
+    @Override
+    public String toString() {
+        return "WebsocketFrame{" +
+                "length=" + length +
+                ", startIndex=" + startIndex +
+                ", payload=" + new String(getPayload()) +
+                '}';
+    }
+
+    public static String getMessage(WebsocketFrame frame) throws IOException {
+        String message;
+        if (frame.getPayload().length >= 2 && Base64GZIP.isGzip(frame.getPayload())) {
+            try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(frame.getPayload()))) {
+                message = Core.read(gis).toString();
+            }
+        } else {
+            message = new String(frame.getPayload());
+        }
+        return message;
+    }
 }

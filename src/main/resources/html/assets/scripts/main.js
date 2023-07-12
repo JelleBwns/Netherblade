@@ -61,7 +61,7 @@ window.onload = function () {
     search.addEventListener('keyup', filter);
 
     var methodsFilter = document.getElementById('methodsFilter');
-    methodsFilter.addEventListener('change', methodsFilterHandler);
+    methodsFilter.addEventListener('change', filter);
 }
 
 function call(url) {
@@ -96,28 +96,17 @@ function wipe() {
     document.getElementById('display').innerHTML = "";
 }
 
-function methodsFilterHandler() {
-    const methodsFilter = document.getElementById('methodsFilter');
+function filter() {
+    const selected = document.getElementById('methodsFilter').value.toLowerCase();
+    const query = document.getElementById('search').value.toLowerCase();
     const display = document.getElementById('display');
     const children = Array.from(display.childNodes);
+
     children.forEach((child) => {
         if (child.outerHTML === undefined) return;
         const method = child.querySelector('.method').innerHTML.toLowerCase();
-        const shouldShow = method === methodsFilter.value.toLowerCase() || methodsFilter.value.toLowerCase() === 'all';
-        toggleHiddenClass(child, shouldShow);
-
-    });
-}
-
-function filter() {
-    const display = document.getElementById('display');
-    const children = Array.from(display.childNodes);
-    const query = search.value.toLowerCase();
-
-    children.forEach((child) => {
-        if (child.outerHTML === undefined) return;
         const source = child.outerHTML.toLowerCase();
-        const shouldShow = source.includes(query);
+        const shouldShow = source.includes(query) && (selected === 'all' || method === selected);
         toggleHiddenClass(child, shouldShow);
     });
 }
@@ -181,7 +170,7 @@ function connect(host) {
             console.log("unknown type: " + json['type']);
         }
         filter();
-        methodsFilterHandler();
+        //methodsFilterHandler();
     };
     socket.onclose = function (msg) {
         console.log("disconnected from " + host);

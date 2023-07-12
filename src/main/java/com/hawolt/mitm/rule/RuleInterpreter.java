@@ -10,6 +10,7 @@ import com.hawolt.mitm.impl.ResponseModule;
 import com.hawolt.mitm.rule.impl.BodyRewriteRule;
 import com.hawolt.mitm.rule.impl.CodeRewriteRule;
 import com.hawolt.mitm.rule.impl.HeaderRewriteRule;
+import com.hawolt.mitm.rule.impl.RiotMessagingServiceRule;
 import com.hawolt.ui.SocketServer;
 import com.hawolt.util.RunLevel;
 import io.javalin.http.Handler;
@@ -18,7 +19,6 @@ import org.json.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +37,7 @@ public class RuleInterpreter {
         put(CommunicationType.OUTGOING, new RequestModule());
     }};
     private final static Map<InstructionType, Function<JSONObject, IRewrite<?, ?>>> converter = new HashMap<InstructionType, Function<JSONObject, IRewrite<?, ?>>>() {{
+        put(InstructionType.RMS, RiotMessagingServiceRule::new);
         put(InstructionType.HEADER, HeaderRewriteRule::new);
         put(InstructionType.BODY, BodyRewriteRule::new);
         put(InstructionType.CODE, CodeRewriteRule::new);
