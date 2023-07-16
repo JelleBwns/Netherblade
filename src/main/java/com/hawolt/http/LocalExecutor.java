@@ -12,7 +12,7 @@ import com.hawolt.ui.SocketServer;
 import com.hawolt.util.Browser;
 import com.hawolt.util.LocaleInstallation;
 import com.hawolt.util.StaticConstants;
-import com.hawolt.yaml.SystemYaml;
+import com.hawolt.yaml.LocalSystemYaml;
 import io.javalin.http.Handler;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -39,8 +39,8 @@ public class LocalExecutor {
         JSONArray array = new JSONArray();
         Logger.debug("system.yaml: {}", LocaleInstallation.SYSTEM_YAML);
         Logger.debug("RiotClientServices: {}", LocaleInstallation.RIOT_CLIENT_SERVICES);
-        Logger.debug("file-content: system.yaml: {}", SystemYaml.config.toString());
-        for (String region : SystemYaml.config.keySet()) {
+        Logger.debug("file-content: system.yaml: {}", LocalSystemYaml.config.toString());
+        for (String region : LocalSystemYaml.config.keySet()) {
             array.put(region);
         }
         object.put("regions", array);

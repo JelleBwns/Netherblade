@@ -12,7 +12,7 @@ import com.hawolt.socket.xmpp.XmppSocketProxy;
 import com.hawolt.ui.Netherblade;
 import com.hawolt.ui.SocketServer;
 import com.hawolt.util.ReflectHttp;
-import com.hawolt.yaml.SystemYaml;
+import com.hawolt.yaml.LocalSystemYaml;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import org.json.JSONObject;
@@ -57,12 +57,12 @@ public class Main {
             Netherblade.create();
             RuleInterpreter.reload(null);
             try {
-                SystemYaml.rewrite();
+                LocalSystemYaml.rewrite();
             } catch (Exception e) {
                 Logger.error(e);
             }
             //TODO experimental
-            for (Map.Entry<Integer, String> entry : SystemYaml.map.entrySet()) {
+            for (Map.Entry<Integer, String> entry : LocalSystemYaml.map.entrySet()) {
                 Logger.debug("[rtmp] setting up proxy on port {} for {}", entry.getKey(), entry.getValue());
                 RtmpSocketProxy rtmp = new RtmpSocketProxy(entry.getValue(), 2099, entry.getKey(), null);
                 Main.rtmp.put(entry.getValue(), rtmp);
