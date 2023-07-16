@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  **/
 
 @SuppressWarnings("all")
-public class SystemYaml {
+public class LocalSystemYaml {
     public static final Map<Integer, String> map = new HashMap<>();
 
 
@@ -27,7 +27,7 @@ public class SystemYaml {
 
     static {
         try {
-            SystemYaml.config = generate();
+            LocalSystemYaml.config = generate();
         } catch (IOException e) {
             Logger.error(e);
             System.err.println("Unable to generate internal json mapping, exiting (1).");
@@ -41,7 +41,7 @@ public class SystemYaml {
 
     public static JSONObject generate() throws IOException {
         YamlReader reader = new YamlReader(new String(Files.readAllBytes(LocaleInstallation.SYSTEM_YAML.toPath())));
-        SystemYaml yaml = reader.read(SystemYaml.class);
+        LocalSystemYaml yaml = reader.read(LocalSystemYaml.class);
         JSONObject object = new JSONObject();
         for (Object key : yaml.region_data.keySet()) {
             YamlRegion yamlRegion = new YamlRegion((String) key, yaml.region_data.get(key));
