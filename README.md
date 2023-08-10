@@ -25,4 +25,4 @@ if you are still hungry for more, feel free to checkout the Wiki
 
 ## Discord
 
-Join the Riotphobia [discord](https://discord.gg/JRDwxFxW7m) to stay up to date with Netherblade and its development
+since this code lacks documentation the best help you can get is my knowledge, proper questions can be asked in this [discord](https://discord.gg/3wknX5gxaW) server, please note that I will not guide you to achieve something or answer beginner level questions
