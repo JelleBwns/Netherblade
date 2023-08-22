@@ -7,10 +7,7 @@ import com.hawolt.mitm.RewriteModule;
 import com.hawolt.mitm.RuleInjector;
 import com.hawolt.mitm.impl.RequestModule;
 import com.hawolt.mitm.impl.ResponseModule;
-import com.hawolt.mitm.rule.impl.BodyRewriteRule;
-import com.hawolt.mitm.rule.impl.CodeRewriteRule;
-import com.hawolt.mitm.rule.impl.HeaderRewriteRule;
-import com.hawolt.mitm.rule.impl.RiotMessagingServiceRule;
+import com.hawolt.mitm.rule.impl.*;
 import com.hawolt.ui.SocketServer;
 import com.hawolt.util.RunLevel;
 import io.javalin.http.Handler;
@@ -37,6 +34,7 @@ public class RuleInterpreter {
         put(CommunicationType.OUTGOING, new RequestModule());
     }};
     private final static Map<InstructionType, Function<JSONObject, IRewrite<?, ?>>> converter = new HashMap<InstructionType, Function<JSONObject, IRewrite<?, ?>>>() {{
+        put(InstructionType.RTMP, RealTimeMessagingProtocolRule::new);
         put(InstructionType.RMS, RiotMessagingServiceRule::new);
         put(InstructionType.HEADER, HeaderRewriteRule::new);
         put(InstructionType.BODY, BodyRewriteRule::new);

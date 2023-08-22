@@ -5,12 +5,10 @@ import com.hawolt.logger.Logger;
 import com.hawolt.mitm.rule.AbstractRewriteRule;
 import com.hawolt.mitm.rule.IRewrite;
 import com.hawolt.mitm.rule.RuleType;
-import com.hawolt.mitm.rule.impl.BodyRewriteRule;
-import com.hawolt.mitm.rule.impl.CodeRewriteRule;
-import com.hawolt.mitm.rule.impl.HeaderRewriteRule;
-import com.hawolt.mitm.rule.impl.RiotMessagingServiceRule;
+import com.hawolt.mitm.rule.impl.*;
 import com.hawolt.socket.rms.WebsocketFrame;
 import com.hawolt.util.Pair;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,11 +37,22 @@ public abstract class RewriteModule<T extends IRequest> {
 
     public WebsocketFrame rewriteRMS(WebsocketFrame frame) {
         List<IRewrite<?, ?>> rules = map.get(InstructionType.RMS);
+        if (rules == null) return frame;
         for (IRewrite<?, ?> rule : rules) {
             if (frame == null) continue;
             frame = rewriteRMS(frame, Unsafe.cast(rule));
         }
         return frame;
+    }
+
+    public byte[] rewriteRTMP(byte[] bytes, JSONObject o) {
+        List<IRewrite<?, ?>> rules = map.get(InstructionType.RTMP);
+        if (rules == null) return bytes;
+        for (IRewrite<?, ?> rule : rules) {
+            if (o == null) continue;
+            bytes = rewriteRTMP(o, Unsafe.cast(rule));
+        }
+        return bytes;
     }
 
     public T rewrite(T communication) {
@@ -73,6 +82,10 @@ public abstract class RewriteModule<T extends IRequest> {
             }
         }
         return communication;
+    }
+
+    private byte[] rewriteRTMP(JSONObject communication, RealTimeMessagingProtocolRule rule) {
+        return rule.rewrite(communication);
     }
 
     private WebsocketFrame rewriteRMS(WebsocketFrame communication, RiotMessagingServiceRule rule) {

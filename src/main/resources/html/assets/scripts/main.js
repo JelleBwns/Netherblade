@@ -233,8 +233,16 @@ function hintSpecial(name, ingoing, value) {
         case "RTMP":
             switch (value['result']) {
                 case "receive":
-                    let response = value['data']['flex.messaging.messages.AsyncMessage']['body']['com.riotgames.platform.serviceproxy.dispatch.LcdsServiceProxyResponse']
-                    uri.innerHTML = "receive: " + response['serviceName'] + " " + response['methodName'] + " " + response['messageId'];
+                    let response = value['data']['flex.messaging.messages.AsyncMessage']['body'];
+                    if (response.hasOwnProperty('com.riotgames.platform.serviceproxy.dispatch.LcdsServiceProxyResponse')) {
+                        response = response['com.riotgames.platform.serviceproxy.dispatch.LcdsServiceProxyResponse'];
+                        uri.innerHTML = "receive: " + response['serviceName'] + " " + response['methodName'] + " " + response['messageId'];
+                    } else if (response.hasOwnProperty('com.riotgames.platform.messaging.persistence.SimpleDialogMessage')) {
+                        response = response['com.riotgames.platform.messaging.persistence.SimpleDialogMessage'];
+                        uri.innerHTML = "receive: " + response['type'] + " " + response['bodyCode'] + " " + response['msgId'];
+                    } else {
+                        uri.innerHTML = "receive: unknown";
+                    }
                     break;
                 case "_result":
                     uri.innerHTML = "result id: " + value['invokeId'];
@@ -519,7 +527,7 @@ function right(response) {
     const copyButton = document.createElement("button");
     copyButton.textContent = "Copy Text";
     copyButton.className = "copy-button";
-    copyButton.addEventListener("click", function() {
+    copyButton.addEventListener("click", function () {
         copyToClipboard(value);
     });
 

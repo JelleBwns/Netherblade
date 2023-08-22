@@ -34,7 +34,7 @@ public class Main {
     public static void main(String[] args) {
         String version = System.getProperty("java.version");
         int major = Integer.parseInt(version.split("\\.")[0]);
-        if (major <= 15) {
+        if (major <= 11) {
             try {
                 ReflectHttp.enable("PATCH");
             } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -43,7 +43,7 @@ public class Main {
                 System.exit(1);
             }
         } else {
-            System.err.println("Incompatible Java version, please use Java 8 upto 15.");
+            System.err.println("Incompatible Java version, please use Java 8 upto 11.");
             System.exit(1);
         }
         try {

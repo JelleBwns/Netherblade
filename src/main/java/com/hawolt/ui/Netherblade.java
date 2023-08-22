@@ -1,6 +1,5 @@
 package com.hawolt.ui;
 
-import com.hawolt.http.LocalExecutor;
 import com.hawolt.logger.Logger;
 import com.hawolt.util.RunLevel;
 import io.javalin.http.Handler;
@@ -27,7 +26,9 @@ public class Netherblade {
 
     private static boolean toggle;
     private static Rectangle previous;
-    public static final Handler MINIMIZE = context -> Netherblade.frame.setState(JFrame.ICONIFIED);
+    public static final Handler MINIMIZE = context -> {
+        Netherblade.frame.setState(JFrame.ICONIFIED);
+    };
     public static final Handler MAXIMIZE = context -> {
         Netherblade.toggle = !Netherblade.toggle;
         if (Netherblade.toggle) {

@@ -208,20 +208,6 @@
             "replace": "$(proxy geo %s)"
           }
         ]
-      },
-      {
-        "method": "OPTIONS",
-        "url": "(.*)",
-        "find": "(.*)",
-        "type": "regex",
-        "groups": [
-          {
-            "id": [
-              1
-            ],
-            "replace": ""
-          }
-        ]
       }
     ],
     "code": [
