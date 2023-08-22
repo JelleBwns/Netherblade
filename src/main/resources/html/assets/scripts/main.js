@@ -515,11 +515,30 @@ function right(response) {
     if (value.length === 0) {
         text.textContent = "Empty Body";
     }
+
+    const copyButton = document.createElement("button");
+    copyButton.textContent = "Copy Text";
+    copyButton.className = "copy-button";
+    copyButton.addEventListener("click", function() {
+        copyToClipboard(value);
+    });
+
     JWTHandler(text, value)
 
+    body.appendChild(copyButton);
     body.appendChild(text);
     right.appendChild(body);
     return right;
+}
+
+// Function to copy text to clipboard
+function copyToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textArea);
 }
 
 
