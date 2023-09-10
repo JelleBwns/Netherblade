@@ -4,6 +4,13 @@
       {
         "method": "*",
         "url": "https://clientconfig.rpg.riotgames.com(.*)",
+        "find": "https://playerpreferences.riotgames.com",
+        "type": "PLAIN",
+        "replace": "http://127.0.0.1:35207"
+      },
+      {
+        "method": "*",
+        "url": "https://clientconfig.rpg.riotgames.com(.*)",
         "find": "\"lol.client_settings.store.use_ledge\":(.*?),",
         "type": "regex",
         "groups": [
