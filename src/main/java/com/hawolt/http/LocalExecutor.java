@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +122,7 @@ public class LocalExecutor {
                         }
                     }
                     received.put("headers", headers2);
-                    received.put("body", response.getByteBody() != null ? new String(response.getByteBody()) : JSONObject.NULL);
+                    received.put("body", response.getByteBody() != null ? new String(response.getByteBody(), StandardCharsets.UTF_8) : JSONObject.NULL);
                     object.put("received", received);
 
                     object.put("type", "http");

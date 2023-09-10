@@ -1,5 +1,6 @@
 package com.hawolt.http.proxy;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class ProxyResponse implements IRequest {
 
     @Override
     public String getBody() {
-        return new String(body);
+        return new String(body, StandardCharsets.UTF_8);
     }
 
     public void setBody(byte[] body) {

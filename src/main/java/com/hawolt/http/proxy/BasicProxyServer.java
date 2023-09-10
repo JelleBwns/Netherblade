@@ -6,6 +6,7 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -78,7 +79,7 @@ public class BasicProxyServer {
             context.header("Content-Length", String.valueOf(content.length));
             context.result(content);
         } else {
-            String content = new String(complete.getByteBody());
+            String content = new String(complete.getByteBody(), StandardCharsets.UTF_8);
             context.header("Content-Length", String.valueOf(content.length()));
             context.result(content);
         }

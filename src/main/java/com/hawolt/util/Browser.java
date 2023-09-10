@@ -8,7 +8,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class Browser {
-
     public static void navigate(String uri) {
         try {
             Desktop.getDesktop().browse(new URI(uri));

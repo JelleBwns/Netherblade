@@ -6,7 +6,7 @@ package com.hawolt.mitm;
  **/
 
 public enum InstructionType {
-    URL, QUERY, HEADER, BODY, CODE, UNKNOWN, RMS;
+    URL, QUERY, HEADER, BODY, CODE, UNKNOWN, RMS, RTMP;
 
     private static final InstructionType[] INSTRUCTION_TYPES = InstructionType.values();
 
