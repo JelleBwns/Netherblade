@@ -4,6 +4,7 @@ import com.hawolt.http.LocalExecutor;
 import com.hawolt.logger.Logger;
 import com.hawolt.mitm.cache.InternalStorage;
 import com.hawolt.mitm.rule.RuleInterpreter;
+import com.hawolt.rtmp.amf.decoder.AMFDecoder;
 import com.hawolt.socket.DataSocketProxy;
 import com.hawolt.socket.rms.RmsSocketProxy;
 import com.hawolt.socket.rms.WebsocketFrame;
@@ -11,7 +12,6 @@ import com.hawolt.socket.rtmp.RtmpSocketProxy;
 import com.hawolt.socket.xmpp.XmppSocketProxy;
 import com.hawolt.ui.Netherblade;
 import com.hawolt.ui.SocketServer;
-import com.hawolt.util.ReflectHttp;
 import com.hawolt.yaml.LocalSystemYaml;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
@@ -32,20 +32,7 @@ public class Main {
     public static DataSocketProxy<?> rms, xmpp;
 
     public static void main(String[] args) {
-        String version = System.getProperty("java.version");
-        int major = Integer.parseInt(version.split("\\.")[0]);
-        if (major <= 11) {
-            try {
-                ReflectHttp.enable("PATCH");
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                Logger.error(e);
-                System.err.println("Unable to modify permitted HTTP methods, exiting (1).");
-                System.exit(1);
-            }
-        } else {
-            System.err.println("Incompatible Java version, please use Java 8 upto 11.");
-            System.exit(1);
-        }
+        AMFDecoder.debug = false;
         try {
             Javalin.create(config -> config.addStaticFiles("/html", Location.CLASSPATH))
                     .before("/v1/*", context -> {
@@ -94,5 +81,4 @@ public class Main {
             System.exit(1);
         }
     }
-
 }

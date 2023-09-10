@@ -1,6 +1,7 @@
 package com.hawolt.mitm.rule;
 
 import com.hawolt.io.Core;
+import com.hawolt.logger.Logger;
 import com.hawolt.mitm.CommunicationType;
 import com.hawolt.mitm.InstructionType;
 import com.hawolt.mitm.RewriteModule;
@@ -55,7 +56,7 @@ public class RuleInterpreter {
                 RuleInterpreter.map.get(communicationType).supply(interpret(first, object));
             }
         } catch (FileNotFoundException e) {
-            System.err.println("instructions.json not present.");
+            Logger.debug("unable to locate custom instruction set, skipping");
         }
         RuleInjector.load(RunLevel.get("inject.json"));
     }

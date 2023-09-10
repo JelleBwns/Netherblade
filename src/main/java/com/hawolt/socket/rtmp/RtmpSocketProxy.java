@@ -33,14 +33,14 @@ public class RtmpSocketProxy extends DataSocketProxy<TypedObject> {
         try {
             if (++count < 6) return b;
             TypedObject object = incoming.decode(Arrays.copyOfRange(b, 12, b.length), new TypedObject());
+            Logger.debug("[rtmp-plaintext] < {}", object);
             JSONObject json = TypedObject.tidy(object);
             JSONObject o = new JSONObject().put("type", "rtmp");
             SocketServer.forward(o.put("in", json).toString());
-            Logger.debug("[rtmp] < {}", json);
             byte[] bytes = Unsafe.cast(RuleInterpreter.map.get(CommunicationType.INGOING).rewriteRTMP(b, json));
             if (bytes == null) return null;
         } catch (Exception e) {
-            Logger.error(e);
+            //TODO ignore these for now
         }
         return b;
     }
@@ -50,10 +50,10 @@ public class RtmpSocketProxy extends DataSocketProxy<TypedObject> {
         try {
             if (++count < 6) return b;
             TypedObject object = incoming.decode(Arrays.copyOfRange(b, 12, b.length), new TypedObject());
+            Logger.debug("[rtmp-plaintext] > {}", object);
             JSONObject json = TypedObject.tidy(object);
             JSONObject o = new JSONObject().put("type", "rtmp");
             SocketServer.forward(o.put("out", json).toString());
-            Logger.debug("[rtmp] > {}", json);
             byte[] bytes = Unsafe.cast(RuleInterpreter.map.get(CommunicationType.OUTGOING).rewriteRTMP(b, json));
             if (bytes == null) return null;
         } catch (Exception e) {
