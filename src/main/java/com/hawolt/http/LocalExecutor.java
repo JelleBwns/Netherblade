@@ -58,12 +58,15 @@ public class LocalExecutor {
             Logger.error(e);
         }
         register("entitlement", "https://entitlements.auth.riotgames.com/api/token/v1");
+        register("playerpreference", "https://playerpreferences.riotgames.com");
         register("email", "https://email-verification.riotgames.com/api");
         register("config", "https://clientconfig.rpg.riotgames.com");
         register("geo", "https://riot-geo.pas.si.riotgames.com");
     };
 
     public static void register(String type, String target) {
+        String proxy = String.join(":", "http://127.0.0.1", String.valueOf(StaticConstants.PORT_MAPPING.get(type)));
+        Logger.debug("[EXECUTOR] SETUP {} PROXY FOR {} ON {}", type, target, proxy);
         if (map.containsKey(type)) {
             map.get(type).proxy(target);
         } else {
