@@ -6,7 +6,7 @@
 
     <groupId>com.hawolt</groupId>
     <artifactId>Netherblade</artifactId>
-    <version>1.401</version>
+    <version>1.41</version>
 
     <build>
         <plugins>
@@ -44,8 +44,8 @@
     </build>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <repositories>
@@ -59,12 +59,12 @@
         <dependency>
             <groupId>com.github.hawolt</groupId>
             <artifactId>riot-xmpp</artifactId>
-            <version>ba4d9f3b54</version>
+            <version>a2910ccb2a</version>
         </dependency>
         <dependency>
             <groupId>com.github.hawolt.hawolt-core</groupId>
             <artifactId>Logger</artifactId>
-            <version>93a8a603ad</version>
+            <version>af5ee5bd75</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
@@ -104,7 +104,7 @@
         <dependency>
             <groupId>com.github.hawolt</groupId>
             <artifactId>league-of-legends-rtmp</artifactId>
-            <version>fc713a5175</version>
+            <version>e39541d701</version>
         </dependency>
     </dependencies>
 </project>
