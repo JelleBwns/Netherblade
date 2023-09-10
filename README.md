@@ -6,7 +6,7 @@ allows you to see what actually happens and modifiy it on the get go, supprting 
 
 ### software requirements
 
-* java 8 upto java 16, anything higher will not work and Netherblade will refuse to start
+* java 8 or higher
 
 ## How to setup the project using IntelliJ
 
