@@ -12,6 +12,7 @@ import com.hawolt.ui.SocketServer;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class RmsSocketProxy extends DataSocketProxy<WebsocketFrame> {
 
     private byte[] handle(boolean in, byte[] b) {
         String hash = hash(b);
-        String raw = new String(b);
+        String raw = new String(b, StandardCharsets.UTF_8);
         if (cache.contains(hash) || raw.contains("HTTP") || transformer == null) return b;
         else cache.add(hash);
         WebsocketFrame frame = transformer.apply(b);

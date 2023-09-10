@@ -6,6 +6,7 @@ import com.hawolt.rtmp.utility.Base64GZIP;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 
@@ -107,7 +108,7 @@ public class WebsocketFrame {
         return "WebsocketFrame{" +
                 "length=" + length +
                 ", startIndex=" + startIndex +
-                ", payload=" + new String(getPayload()) +
+                ", payload=" + new String(getPayload(), StandardCharsets.UTF_8) +
                 '}';
     }
 
@@ -118,7 +119,7 @@ public class WebsocketFrame {
                 message = Core.read(gis).toString();
             }
         } else {
-            message = new String(frame.getPayload());
+            message = new String(frame.getPayload(), StandardCharsets.UTF_8);
         }
         return message;
     }
