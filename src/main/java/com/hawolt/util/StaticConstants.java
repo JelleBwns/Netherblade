@@ -11,6 +11,7 @@ import java.util.Map;
 public class StaticConstants {
 
     public static final Map<String, Integer> PORT_MAPPING = new HashMap<String, Integer>() {{
+        put("playerpreference", 35207);
         put("entitlement", 35202);
         put("platform", 35205);
         put("config", 35200);
