@@ -69,7 +69,7 @@ public class Netherblade {
         frame.setVisible(true);
         Path path = Paths.get(System.getProperty("java.io.tmpdir")).resolve("jcef-bundle");
         try {
-            Chromium chromium = new Chromium("http://127.0.0.1:35199", path, handler);
+            Chromium chromium = new Chromium("http://127.0.0.1:35199/home.html", path, handler);
             frame.dispose();
             frame.setUndecorated(true);
             container.removeAll();
