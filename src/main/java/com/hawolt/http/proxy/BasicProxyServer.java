@@ -73,20 +73,17 @@ public class BasicProxyServer {
         String type = context.header("Content-Type");
         if (type != null) context.header("Content-Type", type);
         //dont touch i dont know why it works this way
+        //idk now it works without the special else-if so i removed the inner else case
         if (context.url().contains("storefront")) {
             String encoding = context.header("Content-Encoding");
             if (encoding != null) context.header("Content-Encoding", encoding);
             byte[] content = complete.getGenerifiedResponse().getBody();
             context.header("Content-Length", String.valueOf(content.length));
             context.result(content);
-        } else if (context.url().contains("clientconfig")) {
+        } else {
             String content = new String(complete.getGenerifiedResponse().getBody(), StandardCharsets.UTF_8);
             context.header("Content-Length", String.valueOf(content.length()));
             context.result(complete.getGenerifiedResponse().getBody());
-        } else {
-            String content = new String(complete.getByteBody(), StandardCharsets.UTF_8);
-            context.header("Content-Length", String.valueOf(content.length()));
-            context.result(content);
         }
     }
 

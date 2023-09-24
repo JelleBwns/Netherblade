@@ -6,7 +6,7 @@ allows you to see what actually happens and modifiy it on the get go, supprting 
 
 ### software requirements
 
-* java 8 or higher
+* java 17 or higher
 
 ## How to setup the project using IntelliJ
 
