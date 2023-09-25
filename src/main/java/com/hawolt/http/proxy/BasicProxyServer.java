@@ -81,9 +81,12 @@ public class BasicProxyServer {
             context.header("Content-Length", String.valueOf(content.length));
             context.result(content);
         } else {
-            String content = new String(complete.getGenerifiedResponse().getBody(), StandardCharsets.UTF_8);
+            //uncomment this if name support breaks
+            //String content = new String(complete.getGenerifiedResponse().getBody(), StandardCharsets.UTF_8);
+            String content = new String(complete.getByteBody(), StandardCharsets.UTF_8);
             context.header("Content-Length", String.valueOf(content.length()));
-            context.result(complete.getGenerifiedResponse().getBody());
+            //context.result(complete.getGenerifiedResponse().getBody());
+            context.result(complete.getBody());
         }
     }
 
