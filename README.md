@@ -12,7 +12,7 @@ by the Client
 ## How to setup the project using IntelliJ
 
 1. within Intellij select `File` -> `New` -> `Project from Version Control...`
-2. insert `git@github.com:Riotphobia/Netherblade.git` for the `URL` field and hit `Clone`
+2. insert `git@github.com:hawolt/Netherblade.git` for the `URL` field and hit `Clone`
 3. IntelliJ should automatically detect the Maven framework, if this is not the case you can rightclick the Netherblade
    folder in the Project hierarchy and select `Add Framework Support...` then select `Maven`
 4. Make sure you are actually using a compatible Java version by selecting `File` -> `Project Structure`, navigate
