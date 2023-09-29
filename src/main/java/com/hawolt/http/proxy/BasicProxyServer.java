@@ -6,7 +6,6 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -81,12 +80,9 @@ public class BasicProxyServer {
             context.header("Content-Length", String.valueOf(content.length));
             context.result(content);
         } else {
-            //uncomment this if name support breaks
-            //String content = new String(complete.getGenerifiedResponse().getBody(), StandardCharsets.UTF_8);
-            String content = new String(complete.getByteBody(), StandardCharsets.UTF_8);
-            context.header("Content-Length", String.valueOf(content.length()));
-            //context.result(complete.getGenerifiedResponse().getBody());
-            context.result(complete.getBody());
+            String encodingIn = response.getHeaders().getOrDefault("content-encoding", Collections.singletonList(null)).get(0);
+            byte[] result = "gzip".equals(encodingIn) ? complete.getByteBody() : complete.getGenerifiedResponse().getBody();
+            context.result(result);
         }
     }
 
