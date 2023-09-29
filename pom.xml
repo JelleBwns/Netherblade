@@ -64,7 +64,7 @@
         <dependency>
             <groupId>com.github.hawolt.hawolt-core</groupId>
             <artifactId>Logger</artifactId>
-            <version>e05000531a</version>
+            <version>f4462e37e5</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
