@@ -23,7 +23,9 @@ public class StaticConstants {
 
     public static final String RIOT_GAMES = "Riot Games";
     public static final String LEAGUE_OF_LEGENDS = "League of Legends";
-
+    public static final String METADATA = "Metadata";
+    public static final String LEAGUE_OF_LEGENDS_LIVE = "league_of_legends.live";
+    public static final String LEAGUE_OF_LEGENDS_INSTALLATION = "league_of_legends.live.product_settings.yaml";
     public static final String RIOT_INSTALLS_JSON = "RiotClientInstalls.json";
     public static final String SYSTEM_YAML = "system.yaml";
 }

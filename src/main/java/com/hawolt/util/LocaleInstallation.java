@@ -1,5 +1,6 @@
 package com.hawolt.util;
 
+import com.esotericsoftware.yamlbeans.YamlReader;
 import com.hawolt.logger.Logger;
 import org.json.JSONObject;
 
@@ -37,7 +38,7 @@ public class LocaleInstallation {
         File file = Paths.get(System.getenv("ALLUSERSPROFILE"))
                 .resolve(StaticConstants.RIOT_GAMES)
                 .resolve(StaticConstants.RIOT_INSTALLS_JSON).toFile();
-        if (!file.exists()) return getRiotClientServices();
+        if (!file.exists()) throw new FileNotFoundException();
         JSONObject object = new JSONObject(new String(Files.readAllBytes(file.toPath())));
         List<String> list = load(new ArrayList<>(), object);
         return list.stream().map(File::new)
@@ -45,17 +46,23 @@ public class LocaleInstallation {
                 .findAny()
                 .orElseGet(LocaleInstallation::get);
     }
+    
 
-    public static File locateYaml(File riotClientServices) throws FileNotFoundException {
+    public static File locateYaml(File riotClientServices) throws IOException {
         if (riotClientServices == null || !riotClientServices.exists()) {
             throw new FileNotFoundException("Unable to locate system.yaml");
         }
-        return riotClientServices.toPath()
-                .getParent()
-                .getParent()
-                .resolve(StaticConstants.LEAGUE_OF_LEGENDS)
-                .resolve(StaticConstants.SYSTEM_YAML)
+        File file = Paths.get(System.getenv("ALLUSERSPROFILE"))
+                .resolve(StaticConstants.RIOT_GAMES)
+                .resolve(StaticConstants.METADATA)
+                .resolve(StaticConstants.LEAGUE_OF_LEGENDS_LIVE)
+                .resolve(StaticConstants.LEAGUE_OF_LEGENDS_INSTALLATION)
                 .toFile();
+        if (!file.exists()) throw new FileNotFoundException();
+        YamlReader reader = new YamlReader(new String(Files.readAllBytes(file.toPath())));
+        String yaml = reader.read().toString();
+        String path = yaml.substring(yaml.indexOf("product_install_full_path=")+26, yaml.indexOf("product_install_root=")-2);
+        return Paths.get(path).resolve("system.yaml").toFile();
     }
 
     private static File get() {
