@@ -4,10 +4,12 @@
 
 package com.hawolt.ui;
 
+import com.hawolt.logger.Logger;
 import me.friwi.jcefmaven.*;
 import org.cef.CefApp;
 import org.cef.CefApp.CefAppState;
 import org.cef.CefClient;
+import org.cef.CefSettings;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefMessageRouter;
 import org.cef.handler.CefFocusHandlerAdapter;
@@ -16,8 +18,10 @@ import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Chromium {
+    private final Path base = Paths.get(System.getProperty("user.home")).resolve(".netherblade");
 
     private final CefApp cefApp_;
     private final CefClient client_;
@@ -31,7 +35,11 @@ public class Chromium {
 
     private Chromium(Path path, IProgressHandler handler, String startURL, boolean useOSR, boolean isTransparent) throws UnsupportedPlatformException, CefInitializationException, IOException, InterruptedException {
         CefAppBuilder builder = new CefAppBuilder();
+        Logger.info("Chromium base: {}", base.resolve("chrome.log"));
+        Files.createDirectories(base);
         builder.getCefSettings().windowless_rendering_enabled = useOSR;
+        builder.getCefSettings().log_severity = CefSettings.LogSeverity.LOGSEVERITY_ERROR;
+        builder.getCefSettings().log_file = Paths.get(System.getProperty("user.home")).resolve(".netherblade").resolve("chrome.log").toString();
         builder.setProgressHandler(handler);
         Files.createDirectories(path);
         builder.setInstallDir(path.toFile());
