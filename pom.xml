@@ -6,7 +6,7 @@
 
     <groupId>com.hawolt</groupId>
     <artifactId>Netherblade</artifactId>
-    <version>1.431</version>
+    <version>1.5</version>
 
     <build>
         <plugins>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>com.github.hawolt</groupId>
             <artifactId>riot-xmpp</artifactId>
-            <version>a2910ccb2a</version>
+            <version>1f9f5b0db4</version>
         </dependency>
         <dependency>
             <groupId>com.github.hawolt.hawolt-core</groupId>
@@ -104,7 +104,7 @@
         <dependency>
             <groupId>com.github.hawolt</groupId>
             <artifactId>league-of-legends-rtmp</artifactId>
-            <version>e39541d701</version>
+            <version>b88d43094b</version>
         </dependency>
     </dependencies>
 </project>
