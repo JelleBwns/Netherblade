@@ -1,6 +1,8 @@
 package com.hawolt;
 
 import com.hawolt.http.LocalExecutor;
+import com.hawolt.io.Core;
+import com.hawolt.io.JsonSource;
 import com.hawolt.logger.Logger;
 import com.hawolt.mitm.cache.InternalStorage;
 import com.hawolt.mitm.rule.RuleInterpreter;
@@ -12,6 +14,8 @@ import com.hawolt.socket.rtmp.RtmpSocketProxy;
 import com.hawolt.socket.xmpp.XmppSocketProxy;
 import com.hawolt.ui.Netherblade;
 import com.hawolt.ui.SocketServer;
+import com.hawolt.util.RunLevel;
+import com.hawolt.util.TaskManager;
 import com.hawolt.yaml.LocalSystemYaml;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
@@ -34,6 +38,12 @@ public class Main {
     public static void main(String[] args) {
         AMFDecoder.debug = false;
         try {
+            JsonSource source = JsonSource.of(Core.read(RunLevel.get("project.json")).toString());
+            Logger.info("Writing log for Netherblade-{}", source.getOrDefault("version", "UNKNOWN-VERSION"));
+            for (String pid : TaskManager.retrieve("RiotClientServices")) {
+                Logger.debug("Found an existing RiotClientService instance, killing {}", pid);
+                TaskManager.kill(pid);
+            }
             Javalin.create(config -> config.addStaticFiles("/html", Location.CLASSPATH))
                     .before("/v1/*", context -> {
                         context.header("Access-Control-Allow-Origin", "*");
