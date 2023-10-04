@@ -46,7 +46,7 @@ public class LocaleInstallation {
                 .findAny()
                 .orElseGet(LocaleInstallation::get);
     }
-    
+
 
     public static File locateYaml(File riotClientServices) throws IOException {
         if (riotClientServices == null || !riotClientServices.exists()) {
@@ -61,7 +61,7 @@ public class LocaleInstallation {
         if (!file.exists()) throw new FileNotFoundException();
         YamlReader reader = new YamlReader(new String(Files.readAllBytes(file.toPath())));
         String yaml = reader.read().toString();
-        String path = yaml.substring(yaml.indexOf("product_install_full_path=")+26, yaml.indexOf("product_install_root=")-2);
+        String path = yaml.substring(yaml.indexOf("product_install_full_path=") + 26, yaml.indexOf("product_install_root=") - 2);
         return Paths.get(path).resolve("system.yaml").toFile();
     }
 
