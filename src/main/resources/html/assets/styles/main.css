@@ -15,7 +15,6 @@ body {
 }
 
 body {
-    border: 5px rgb(224, 224, 224) solid;
     flex-direction: column;
     border-top: none;
     display: flex;
@@ -138,12 +137,13 @@ body {
 }
 
 .navbar {
-    height: 4rem !important;
+    height: 3rem !important;
     background-color: #e0e0e0 !important;
     transition: all 0.5s ease-in-out;
     border-radius: 0rem;
     width: 100%;
     margin: 0 !important;
+    padding-top: 0px !important;
 }
 
 .navbar:hover {
