@@ -30,7 +30,7 @@ public class Chromium {
     private boolean browserFocus = true;
 
     public Chromium(String startURL, Path path, IProgressHandler handler) throws UnsupportedPlatformException, CefInitializationException, IOException, InterruptedException {
-        this(path, handler, startURL, false, false);
+        this(path, handler, startURL, true, false);
     }
 
     private Chromium(Path path, IProgressHandler handler, String startURL, boolean useOSR, boolean isTransparent) throws UnsupportedPlatformException, CefInitializationException, IOException, InterruptedException {
@@ -40,6 +40,7 @@ public class Chromium {
         builder.getCefSettings().windowless_rendering_enabled = useOSR;
         builder.getCefSettings().log_severity = CefSettings.LogSeverity.LOGSEVERITY_ERROR;
         builder.getCefSettings().log_file = Paths.get(System.getProperty("user.home")).resolve(".netherblade").resolve("chrome.log").toString();
+        builder.addJcefArgs("--disable-gpu");
         builder.setProgressHandler(handler);
         Files.createDirectories(path);
         builder.setInstallDir(path.toFile());
