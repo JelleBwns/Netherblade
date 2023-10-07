@@ -1,26 +1,4 @@
-let socket;
-
-function handle(i, e) {
-    let json = new Object();
-    json.type = i;
-    json.x = e.clientX;
-    json.y = e.clientY;
-    json.moveX = e.movementX;
-    json.moveY = e.movementY;
-    json.navbar = e.target.matches('.navbar');
-    socket.send(JSON.stringify(json));
-}
-
 window.onload = function () {
-    addEventListener("mousemove", e => {
-        handle(1, e)
-    });
-    addEventListener("mousedown", e => {
-        handle(2, e)
-    });
-    addEventListener("click", e => {
-        handle(3, e)
-    });
     fetch('http://localhost:35199/v1/client/available')
         .then((response) => response.json())
         .then((data) => {
@@ -152,7 +130,7 @@ function launch() {
 }
 
 function connect(host) {
-    socket = new WebSocket(host);
+    let socket = new WebSocket(host);
     socket.onopen = function (msg) {
         console.log("Connected to " + host);
     };

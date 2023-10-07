@@ -6,13 +6,13 @@ import io.javalin.http.Handler;
 import me.friwi.jcefmaven.CefInitializationException;
 import me.friwi.jcefmaven.UnsupportedPlatformException;
 import org.cef.CefApp;
-import org.json.JSONObject;
+import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,9 +23,9 @@ import java.nio.file.Paths;
  **/
 
 public class Netherblade {
-
-    private static boolean toggle;
+    private static Point initialClick;
     private static Rectangle previous;
+    private static boolean toggle;
     public static final Handler MINIMIZE = context -> {
         Netherblade.frame.setState(JFrame.ICONIFIED);
     };
@@ -46,7 +46,7 @@ public class Netherblade {
     };
     public static JFrame frame;
 
-    public static void create() throws IOException {
+    public static void create(boolean useOSR) throws IOException {
         JFrame frame = new JFrame();
         String icon = "netherblade.png";
         frame.setIconImage(ImageIO.read(RunLevel.get(icon)));
@@ -69,12 +69,20 @@ public class Netherblade {
         frame.setVisible(true);
         Path path = Paths.get(System.getProperty("java.io.tmpdir")).resolve("jcef-bundle");
         try {
-            Chromium chromium = new Chromium("http://127.0.0.1:35199/home.html", path, handler);
+            Chromium chromium = new Chromium("http://127.0.0.1:35199/home.html", path, useOSR, handler);
             frame.dispose();
             frame.setUndecorated(true);
             container.removeAll();
-            container.setPreferredSize(new Dimension(1000, 620));
+            container.setBackground(new Color(224, 224, 224));
+            container.setPreferredSize(new Dimension(1010, 620));
+            JComponent component = (JComponent) container;
+            component.setBorder(new EmptyBorder(0, 5, 5, 5));
+            JPanel move = getHeader(frame);
+            container.add(move, BorderLayout.NORTH);
             container.add(chromium.getBrowserUI(), BorderLayout.CENTER);
+            ComponentResizer resizer = new ComponentResizer();
+            resizer.registerComponent(frame);
+            resizer.setSnapSize(new Dimension(10, 10));
             frame.pack();
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
@@ -82,6 +90,32 @@ public class Netherblade {
             Logger.error(e);
         }
         Netherblade.frame = frame;
+    }
+
+    @NotNull
+    private static JPanel getHeader(Frame source) {
+        JPanel move = new JPanel();
+        move.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(final MouseEvent e) {
+                Netherblade.initialClick = e.getPoint();
+            }
+        });
+        move.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(final MouseEvent e) {
+                final int thisX = source.getLocation().x;
+                final int thisY = source.getLocation().y;
+                final int xMoved = e.getX() - Netherblade.initialClick.x;
+                final int yMoved = e.getY() - Netherblade.initialClick.y;
+                final int X = thisX + xMoved;
+                final int Y = thisY + yMoved;
+                source.setLocation(X, Y);
+            }
+        });
+        move.setBackground(new Color(224, 224, 224));
+        move.setPreferredSize(new Dimension(0, 6));
+        return move;
     }
 
     private static final int[] CURSOR_MAPPING = new int[]{
@@ -99,48 +133,6 @@ public class Netherblade {
     private static boolean isHolding, move, resize;
     private static Rectangle bounds;
     private static Point drag = new Point(0, 0);
-
-    public static void redirect(String message) {
-        JSONObject object = new JSONObject(message);
-        int opCode = object.getInt("type");
-        if (opCode >= 1 || opCode <= 3) {
-            boolean navbar = object.getBoolean("navbar");
-            int mouseX = object.getInt("x");
-            int mouseY = object.getInt("y");
-            int cursorIndex = getCursor(getCorner(mouseX, mouseY));
-            int current = frame.getCursor().getType();
-            if (current != 0 || cursorIndex == 5) frame.setCursor(Cursor.getPredefinedCursor(cursorIndex == 5 ? 5 : 0));
-            if (opCode == 2) {
-                Netherblade.isHolding = true;
-                Netherblade.move = navbar;
-                Netherblade.bounds = frame.getBounds();
-                Netherblade.resize = cursorIndex == 5;
-                Netherblade.drag.setLocation(mouseX, mouseY);
-            } else if (opCode == 3) {
-                Netherblade.isHolding = false;
-                Netherblade.resize = false;
-                Netherblade.move = false;
-            }
-            if (!isHolding) return;
-            Point screen = frame.getLocationOnScreen();
-            int moveX = object.getInt("moveX");
-            int moveY = object.getInt("moveY");
-            if (Netherblade.move) {
-                if (opCode == 1) frame.setLocation(screen.x + moveX, screen.y + moveY);
-            } else if (Netherblade.resize) {
-                if (Netherblade.drag.y < 30) {
-                    Netherblade.bounds.x += mouseX - drag.x;
-                    Netherblade.bounds.y += mouseY - drag.y;
-                } else if (drag.y > 30) {
-                    Netherblade.bounds.width += mouseX - frame.getWidth() + 1;
-                    Netherblade.bounds.height += mouseY - frame.getHeight() + 1;
-                    drag.setLocation(mouseX, mouseY);
-                }
-                frame.setBounds(Netherblade.bounds);
-            }
-        }
-
-    }
 
     private static int getCorner(int x, int y) {
         Insets insets = frame.getInsets();
