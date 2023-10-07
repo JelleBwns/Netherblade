@@ -215,6 +215,55 @@
             "replace": "$(proxy geo %s)"
           }
         ]
+      },
+      {
+        "method": "*",
+        "url": "https://clientconfig.rpg.riotgames.com(.*)",
+        "find": "\"keystone\\.rso_auth\\.url\":\"(.*?)\",",
+        "type": "netherscript",
+        "groups": [
+          {
+            "id": [
+              1
+            ],
+            "replace": "$(proxy auth %s)"
+          }
+        ]
+      },
+      {
+        "method": "*",
+        "url": "https://clientconfig.rpg.riotgames.com(.*)",
+        "find": "\"keystone\\.rso-authenticator\\.service_url\":\"(.*?)\",",
+        "type": "netherscript",
+        "groups": [
+          {
+            "id": [
+              1
+            ],
+            "replace": "$(proxy authenticator %s)"
+          }
+        ]
+      },
+      {
+        "method": "*",
+        "url": "https://clientconfig.rpg.riotgames.com(.*)",
+        "find": "\"keystone\\.entitlements\\.url\":\"(.*?)/api/token/v1\",",
+        "type": "netherscript",
+        "groups": [
+          {
+            "id": [
+              1
+            ],
+            "replace": "$(proxy entitlements %s)"
+          }
+        ]
+      },
+      {
+        "method": "*",
+        "url": "https://auth.riotgames.com/.well-known/openid-configuration",
+        "find": "https://auth.riotgames.com",
+        "type": "PLAIN",
+        "replace": "http://127.0.0.1:35208"
       }
     ],
     "code": [
