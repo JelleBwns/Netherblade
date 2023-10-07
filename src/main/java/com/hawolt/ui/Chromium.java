@@ -29,8 +29,8 @@ public class Chromium {
     private final Component browserUI_;
     private boolean browserFocus = true;
 
-    public Chromium(String startURL, Path path, IProgressHandler handler) throws UnsupportedPlatformException, CefInitializationException, IOException, InterruptedException {
-        this(path, handler, startURL, true, false);
+    public Chromium(String startURL, Path path, boolean useOSR, IProgressHandler handler) throws UnsupportedPlatformException, CefInitializationException, IOException, InterruptedException {
+        this(path, handler, startURL, useOSR, false);
     }
 
     private Chromium(Path path, IProgressHandler handler, String startURL, boolean useOSR, boolean isTransparent) throws UnsupportedPlatformException, CefInitializationException, IOException, InterruptedException {
