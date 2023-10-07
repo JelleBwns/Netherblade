@@ -68,6 +68,9 @@ public class LocalExecutor {
         register("email", "https://email-verification.riotgames.com/api", id);
         register("config", "https://clientconfig.rpg.riotgames.com", id);
         register("geo", "https://riot-geo.pas.si.riotgames.com", id);
+        register("auth", "https://auth.riotgames.com", id);
+        register("authenticator", "https://authenticate.riotgames.com", id);
+        register("entitlements", "https://entitlements.auth.riotgames.com", id);
     };
 
     public static void register(String type, String target, String id) {

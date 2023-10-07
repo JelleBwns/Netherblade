@@ -19,6 +19,9 @@ public class StaticConstants {
         put("queue", 35203);
         put("ledge", 35204);
         put("geo", 35206);
+        put("auth", 35208);
+        put("authenticator", 35209);
+        put("entitlements", 35210);
     }};
 
     public static final String RIOT_GAMES = "Riot Games";
