@@ -35,27 +35,27 @@ public abstract class RewriteModule<T extends IRequest> {
         map.get(type).add(rule);
     }
 
-    public WebsocketFrame rewriteRMS(WebsocketFrame frame) {
+    public WebsocketFrame rewriteRMS(String id, WebsocketFrame frame) {
         List<IRewrite<?, ?>> rules = map.get(InstructionType.RMS);
         if (rules == null) return frame;
         for (IRewrite<?, ?> rule : rules) {
             if (frame == null) continue;
-            frame = rewriteRMS(frame, Unsafe.cast(rule));
+            frame = rewriteRMS(id, frame, Unsafe.cast(rule));
         }
         return frame;
     }
 
-    public byte[] rewriteRTMP(byte[] bytes, JSONObject o) {
+    public byte[] rewriteRTMP(String id, byte[] bytes, JSONObject o) {
         List<IRewrite<?, ?>> rules = map.get(InstructionType.RTMP);
         if (rules == null) return bytes;
         for (IRewrite<?, ?> rule : rules) {
             if (o == null) continue;
-            bytes = rewriteRTMP(o, Unsafe.cast(rule));
+            bytes = rewriteRTMP(id, o, Unsafe.cast(rule));
         }
         return bytes;
     }
 
-    public T rewrite(T communication) {
+    public T rewrite(String id, T communication) {
         for (InstructionType type : map.keySet()) {
             if (type == InstructionType.RMS) continue;
             List<IRewrite<?, ?>> rules = map.get(type);
@@ -64,19 +64,19 @@ public abstract class RewriteModule<T extends IRequest> {
                 Logger.debug("Matching url for {} rule [{}] {} ", type.name(), communication.method(), communication.url());
                 switch (type) {
                     case CODE:
-                        communication = rewriteCode(communication, Unsafe.cast(rule));
+                        communication = rewriteCode(id, communication, Unsafe.cast(rule));
                         break;
                     case URL:
-                        communication = rewriteURL(communication, Unsafe.cast(rule));
+                        communication = rewriteURL(id, communication, Unsafe.cast(rule));
                         break;
                     case QUERY:
-                        communication = rewriteQuery(communication, Unsafe.cast(rule));
+                        communication = rewriteQuery(id, communication, Unsafe.cast(rule));
                         break;
                     case HEADER:
-                        communication = rewriteHeaders(communication, Unsafe.cast(rule));
+                        communication = rewriteHeaders(id, communication, Unsafe.cast(rule));
                         break;
                     case BODY:
-                        communication = rewriteBody(communication, Unsafe.cast(rule));
+                        communication = rewriteBody(id, communication, Unsafe.cast(rule));
                         break;
                 }
             }
@@ -84,32 +84,32 @@ public abstract class RewriteModule<T extends IRequest> {
         return communication;
     }
 
-    private byte[] rewriteRTMP(JSONObject communication, RealTimeMessagingProtocolRule rule) {
-        return rule.rewrite(communication);
+    private byte[] rewriteRTMP(String id, JSONObject communication, RealTimeMessagingProtocolRule rule) {
+        return rule.rewrite(id, communication);
     }
 
-    private WebsocketFrame rewriteRMS(WebsocketFrame communication, RiotMessagingServiceRule rule) {
-        return rule.rewrite(communication);
+    private WebsocketFrame rewriteRMS(String id, WebsocketFrame communication, RiotMessagingServiceRule rule) {
+        return rule.rewrite(id, communication);
     }
 
-    private T rewriteBody(T communication, BodyRewriteRule rule) {
+    private T rewriteBody(String id, T communication, BodyRewriteRule rule) {
         String body = communication.getBody();
-        body = rule.rewrite(body);
+        body = rule.rewrite(id, body);
         communication.setBody(body);
         return communication;
     }
 
-    private T rewriteHeaders(T communication, HeaderRewriteRule rule) {
-        Pair<String, String> result = rule.rewrite(communication.getHeaders());
+    private T rewriteHeaders(String id, T communication, HeaderRewriteRule rule) {
+        Pair<String, String> result = rule.rewrite(id, communication.getHeaders());
         if (result == null && rule.getType() == RuleType.REMOVE) communication.removeHeader(rule.getKey());
         else if (result != null) communication.addHeader(result.getKey(), result.getValue());
         return communication;
     }
 
-    protected abstract T rewriteQuery(T communication, AbstractRewriteRule<?, ?> rule);
+    protected abstract T rewriteQuery(String id, T communication, AbstractRewriteRule<?, ?> rule);
 
-    protected abstract T rewriteURL(T communication, AbstractRewriteRule<?, ?> rule);
+    protected abstract T rewriteURL(String id, T communication, AbstractRewriteRule<?, ?> rule);
 
-    protected abstract T rewriteCode(T communication, CodeRewriteRule rule);
+    protected abstract T rewriteCode(String id, T communication, CodeRewriteRule rule);
 
 }

@@ -37,7 +37,7 @@ public class RtmpSocketProxy extends DataSocketProxy<TypedObject> {
             JSONObject json = TypedObject.tidy(object);
             JSONObject o = new JSONObject().put("type", "rtmp");
             SocketServer.forward(o.put("in", json).toString());
-            byte[] bytes = Unsafe.cast(RuleInterpreter.map.get(CommunicationType.INGOING).rewriteRTMP(b, json));
+            byte[] bytes = Unsafe.cast(RuleInterpreter.map.get(CommunicationType.INGOING).rewriteRTMP(null, b, json));
             if (bytes == null) return null;
         } catch (Exception e) {
             //TODO ignore these for now
@@ -54,7 +54,7 @@ public class RtmpSocketProxy extends DataSocketProxy<TypedObject> {
             JSONObject json = TypedObject.tidy(object);
             JSONObject o = new JSONObject().put("type", "rtmp");
             SocketServer.forward(o.put("out", json).toString());
-            byte[] bytes = Unsafe.cast(RuleInterpreter.map.get(CommunicationType.OUTGOING).rewriteRTMP(b, json));
+            byte[] bytes = Unsafe.cast(RuleInterpreter.map.get(CommunicationType.OUTGOING).rewriteRTMP(null, b, json));
             if (bytes == null) return null;
         } catch (Exception e) {
             Logger.error(e);

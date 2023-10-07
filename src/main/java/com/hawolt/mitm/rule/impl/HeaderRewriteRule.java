@@ -33,7 +33,7 @@ public class HeaderRewriteRule extends AbstractHttpRewriteRule<Map<String, List<
     }
 
     @Override
-    public Pair<String, String> rewrite(Map<String, List<String>> in) {
+    public Pair<String, String> rewrite(String id, Map<String, List<String>> in) {
         switch (type) {
             case MODIFY:
             case ADD:

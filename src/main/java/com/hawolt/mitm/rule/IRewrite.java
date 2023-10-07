@@ -8,7 +8,7 @@ import com.hawolt.http.proxy.IRequest;
  **/
 
 public interface IRewrite<T, S> {
-    S rewrite(T in);
+    S rewrite(String id, T in);
 
     RuleType getType();
 

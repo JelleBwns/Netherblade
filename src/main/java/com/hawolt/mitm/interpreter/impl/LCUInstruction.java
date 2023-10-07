@@ -12,7 +12,7 @@ import java.io.IOException;
 public class LCUInstruction extends AbstractInstruction {
 
     @Override
-    protected String modify(String[] args) throws IOException {
+    protected String modify(String id, String[] args) throws IOException {
         String method = args[1];
         LeagueClient client = WMIC.retrieve(args[2]);
         if (client == null) throw new IOException("WMIC was unable to find associated Client");

@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class ReplaceStringInstruction extends AbstractInstruction {
     @Override
-    protected String modify(String[] args) throws Exception {
+    protected String modify(String id,String[] args) throws Exception {
         String full = String.join("", Arrays.copyOfRange(args, 3, args.length));
         String original = args[1];
         String replacement = args[2];

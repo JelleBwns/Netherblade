@@ -18,7 +18,7 @@ public class RealTimeMessagingProtocolRule extends AbstractRewriteRule<JSONObjec
     }
 
     @Override
-    public byte[] rewrite(JSONObject o) {
+    public byte[] rewrite(String id, JSONObject o) {
         return o.toString().contains(plain) ? null : new byte[0];
     }
 

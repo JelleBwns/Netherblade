@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 public class DeclareInstruction extends AbstractInstruction {
 
     @Override
-    protected String modify(String[] args) {
+    protected String modify(String id, String[] args) {
         return String.join(" ", args[1], Arrays.stream(args).skip(2).collect(Collectors.joining(" ")));
     }
 

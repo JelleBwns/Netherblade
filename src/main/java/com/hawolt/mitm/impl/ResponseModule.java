@@ -13,18 +13,18 @@ import com.hawolt.mitm.rule.impl.CodeRewriteRule;
 public class ResponseModule extends RewriteModule<ProxyResponse> {
 
     @Override
-    protected ProxyResponse rewriteQuery(ProxyResponse communication, AbstractRewriteRule<?, ?> rule) {
+    protected ProxyResponse rewriteQuery(String id, ProxyResponse communication, AbstractRewriteRule<?, ?> rule) {
         return communication;
     }
 
     @Override
-    protected ProxyResponse rewriteURL(ProxyResponse communication, AbstractRewriteRule<?, ?> rule) {
+    protected ProxyResponse rewriteURL(String id, ProxyResponse communication, AbstractRewriteRule<?, ?> rule) {
         return communication;
     }
 
     @Override
-    protected ProxyResponse rewriteCode(ProxyResponse communication, CodeRewriteRule rule) {
-        communication.setCode(rule.rewrite(communication.getCode()));
+    protected ProxyResponse rewriteCode(String id, ProxyResponse communication, CodeRewriteRule rule) {
+        communication.setCode(rule.rewrite(id, communication.getCode()));
         return communication;
     }
 }

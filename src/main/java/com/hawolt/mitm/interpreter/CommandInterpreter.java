@@ -23,11 +23,11 @@ public class CommandInterpreter {
         INSTRUCTION_MAP.put("lcu", new LCUInstruction());
     }
 
-    public static String parse(String in) throws Exception {
-        return parse(in, null);
+    public static String parse(String id, String in) throws Exception {
+        return parse(id, in, null);
     }
 
-    public static String parse(String in, String port) throws Exception {
+    public static String parse(String id, String in, String port) throws Exception {
         int[] occurrences = new int[0];
         int index = -1;
         while ((index = in.indexOf('$', index + 1)) != -1) {
@@ -46,7 +46,7 @@ public class CommandInterpreter {
             String[] args = command.split(" ");
             if (INSTRUCTION_MAP.containsKey(args[0])) {
                 Instruction instruction = INSTRUCTION_MAP.get(args[0]);
-                String result = instruction.manipulate(args);
+                String result = instruction.manipulate(id, args);
                 if (instruction instanceof VariableInstruction) {
                     boolean available = map.containsKey(args[1]);
                     if (!available) {

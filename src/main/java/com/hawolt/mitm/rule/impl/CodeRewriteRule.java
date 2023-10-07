@@ -19,7 +19,7 @@ public class CodeRewriteRule extends AbstractHttpRewriteRule<Integer, Integer> {
     }
 
     @Override
-    public Integer rewrite(Integer in) {
+    public Integer rewrite(String id, Integer in) {
         Logger.debug("Rewriting code from {} to {} for {}", in, code, url);
         return code;
     }

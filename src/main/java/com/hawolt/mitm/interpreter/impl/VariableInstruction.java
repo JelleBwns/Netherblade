@@ -5,7 +5,7 @@ import com.hawolt.mitm.interpreter.AbstractInstruction;
 public class VariableInstruction extends AbstractInstruction {
 
     @Override
-    protected String modify(String[] args) {
+    protected String modify(String id, String[] args) {
         return null;
     }
 
