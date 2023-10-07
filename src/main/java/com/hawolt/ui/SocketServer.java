@@ -5,7 +5,6 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-import javax.swing.*;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -57,7 +56,7 @@ public class SocketServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        Netherblade.redirect(message);
+
     }
 
     @Override
