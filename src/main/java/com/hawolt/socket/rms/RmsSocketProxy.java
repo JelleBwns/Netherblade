@@ -52,7 +52,7 @@ public class RmsSocketProxy extends DataSocketProxy<WebsocketFrame> {
     private FrameAction handle(boolean in, WebsocketFrame frame) throws IOException {
         if (frame.getOpCode() != 4) return FrameAction.DROP;
         CommunicationType type = in ? CommunicationType.INGOING : CommunicationType.OUTGOING;
-        WebsocketFrame modified = Unsafe.cast(RuleInterpreter.map.get(type).rewriteRMS(frame));
+        WebsocketFrame modified = Unsafe.cast(RuleInterpreter.map.get(type).rewriteRMS(null, frame));
         if (modified == null) {
             Logger.error("[rms] drop: {}", frame);
             return FrameAction.DROP;

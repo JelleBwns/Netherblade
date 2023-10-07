@@ -5,7 +5,7 @@ import com.hawolt.mitm.interpreter.AbstractInstruction;
 public class IntegerMathInstruction extends AbstractInstruction {
 
     @Override
-    protected String modify(String[] args) {
+    protected String modify(String id, String[] args) {
         int val1 = Integer.parseInt(args[1]);
         String operator = args[2];
         int val2 = Integer.parseInt(args[3]);

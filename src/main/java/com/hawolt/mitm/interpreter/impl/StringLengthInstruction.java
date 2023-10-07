@@ -5,7 +5,7 @@ import com.hawolt.mitm.interpreter.AbstractInstruction;
 public class StringLengthInstruction extends AbstractInstruction {
 
     @Override
-    protected String modify(String[] args) {
+    protected String modify(String id, String[] args) {
         return String.valueOf(args[1].length());
     }
 

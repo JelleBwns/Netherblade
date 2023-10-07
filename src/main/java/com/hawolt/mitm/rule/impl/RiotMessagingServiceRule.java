@@ -22,7 +22,7 @@ public class RiotMessagingServiceRule extends AbstractRewriteRule<WebsocketFrame
     }
 
     @Override
-    public WebsocketFrame rewrite(WebsocketFrame frame) {
+    public WebsocketFrame rewrite(String id, WebsocketFrame frame) {
         try {
             String message = WebsocketFrame.getMessage(frame);
             if (message.contains(plain)) return null;

@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class JSONObjectInstruction extends AbstractInstruction {
     @Override
-    protected String modify(String[] args) throws Exception {
+    protected String modify(String id,String[] args) throws Exception {
         String full = String.join("", Arrays.copyOfRange(args, 2, args.length));
         Logger.debug("[NETHERSCRIPT-PARSER] FETCH KEY {} FROM PROVIDED JSON", args[1], full);
         JSONObject object = new JSONObject(full);

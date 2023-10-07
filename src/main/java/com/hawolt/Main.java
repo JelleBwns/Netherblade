@@ -80,6 +80,18 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        try {
+            JsonSource source = JsonSource.of(Core.read(RunLevel.get("project.json")).toString());
+            Logger.info("Writing log for Netherblade-{}", source.getOrDefault("version", "UNKNOWN-VERSION"));
+            for (String pid : TaskManager.retrieve("RiotClientServices")) {
+                Logger.debug("Found an existing RiotClientService instance, killing {}", pid);
+                TaskManager.kill(pid);
+            }
+        } catch (IOException e) {
+            Logger.error(e);
+            System.err.println("Unable to launch Netherblade, exiting (1).");
+            System.exit(1);
+        }
         List<String> arguments = Arrays.asList(args);
         boolean useOSR = arguments.contains("--osr");
         if (useOSR && !validateExportOptions()) {
@@ -99,12 +111,6 @@ public class Main {
         } else {
             AMFDecoder.debug = false;
             try {
-                JsonSource source = JsonSource.of(Core.read(RunLevel.get("project.json")).toString());
-                Logger.info("Writing log for Netherblade-{}", source.getOrDefault("version", "UNKNOWN-VERSION"));
-                for (String pid : TaskManager.retrieve("RiotClientServices")) {
-                    Logger.debug("Found an existing RiotClientService instance, killing {}", pid);
-                    TaskManager.kill(pid);
-                }
                 Javalin.create(config -> config.addStaticFiles("/html", Location.CLASSPATH))
                         .before("/v1/*", context -> {
                             context.header("Access-Control-Allow-Origin", "*");

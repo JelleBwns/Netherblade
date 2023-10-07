@@ -1,6 +1,7 @@
 package com.hawolt.http.proxy;
 
 import com.hawolt.http.IRequestModifier;
+import com.hawolt.http.LocalExecutor;
 import com.hawolt.logger.Logger;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
@@ -15,11 +16,13 @@ import java.util.*;
 
 public class BasicProxyServer {
     private final Map<String, List<IRequestModifier>> map = new HashMap<>();
-
+    private final String id, host;
     private String target;
 
-    public BasicProxyServer(int port, String target) {
+    public BasicProxyServer(int port, String target, String id) {
+        this.host = target.split("/", 3)[2].split("/")[0];
         this.target = target;
+        this.id = id;
         Javalin javalin = Javalin.create().start("127.0.0.1", port);
         javalin.options("*", this::forward);
         javalin.delete("*", this::forward);
@@ -46,6 +49,8 @@ public class BasicProxyServer {
             if (header.equalsIgnoreCase("Host")) continue;
             initial.addHeader(header, context.headerMap().get(header));
         }
+        String cookie = LocalExecutor.clientCookieHandlerMap.get(id).getCookie(host);
+        if (!cookie.isEmpty()) initial.addHeader("Cookie", cookie);
         initial.setBody(body);
         ProxyResponse response = null;
         if (map.containsKey(method)) {
@@ -68,11 +73,10 @@ public class BasicProxyServer {
             }
         }
         ProxyResponse complete = Objects.requireNonNull(response);
+        LocalExecutor.clientCookieHandlerMap.get(id).handle(response);
         context.status(complete.getCode());
         String type = context.header("Content-Type");
         if (type != null) context.header("Content-Type", type);
-        //dont touch i dont know why it works this way
-        //idk now it works without the special else-if so i removed the inner else case
         if (context.url().contains("storefront")) {
             String encoding = context.header("Content-Encoding");
             if (encoding != null) context.header("Content-Encoding", encoding);

@@ -68,7 +68,7 @@ public class BodyRewriteRule extends AbstractHttpRewriteRule<String, String> {
     }
 
     @Override
-    public String rewrite(String in) {
+    public String rewrite(String id, String in) {
         Matcher matcher;
         StringBuilder builder;
         List<Replacement> list;
@@ -104,7 +104,7 @@ public class BodyRewriteRule extends AbstractHttpRewriteRule<String, String> {
                     } else {
                         String source = builder.substring(rule.getStart(), rule.getEnd());
                         try {
-                            String replacement = CommandInterpreter.parse(String.format(rule.getReplacement(), source));
+                            String replacement = CommandInterpreter.parse(id, String.format(rule.getReplacement(), source));
                             builder.replace(rule.getStart(), rule.getEnd(), replacement);
                             Logger.info("[REWRITE-NETHERSCRIPT] {}:{} -> {}", i, target, replacement);
                         } catch (Exception e) {
