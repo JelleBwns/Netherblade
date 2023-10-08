@@ -36,7 +36,13 @@ window.onload = function () {
         }
     });
     var search = document.getElementById('search');
-    search.addEventListener('keyup', filter);
+    var timer;
+    search.addEventListener('keyup', function() {
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+            filter();
+        }, 150);
+    });
 
     var methodsFilter = document.getElementById('methodsFilter');
     methodsFilter.addEventListener('change', filter);
@@ -83,9 +89,47 @@ function filter() {
     children.forEach((child) => {
         if (child.outerHTML === undefined) return;
         const method = child.querySelector('.method').innerHTML.toLowerCase();
-        const source = child.outerHTML.toLowerCase();
-        const shouldShow = source.includes(query) && (selected === 'all' || method === selected);
+        // only search in these classes
+        const selectedElements = child.querySelectorAll('.request-value, .uri, .code, .jwt-button');
+        let source = '';
+        selectedElements.forEach((element) => {
+            // include decoded JWTs
+            if (element.classList.contains('jwt-button')) {
+                source += element.outerHTML.replace(/&quot;/g, '"') + " ";
+            }
+            else {
+                source += element.textContent + " ";
+            }
+        });
+        const shouldShow = source.toLowerCase().includes(query) && (selected === 'all' || method === selected);
         toggleHiddenClass(child, shouldShow);
+
+        if (shouldShow) {
+            const requestValueElements = child.getElementsByClassName('request-value');
+            for (const requestValueElement of requestValueElements) {
+                //skip hidden requests
+                let currentElement = requestValueElement;
+                let shouldContinue = false;
+                while (currentElement.parentElement) {
+                    const parentName = currentElement.parentElement.classList.value;
+                    if (parentName.includes('bonus-hint hidden') || parentName.includes("request hidden")) {
+                        shouldContinue = true;
+                        break;
+                    }
+                    currentElement = currentElement.parentElement;
+                }
+                if (shouldContinue) {
+                    continue;
+                }
+
+                let contentText = requestValueElement.innerHTML.replaceAll('<span class="highlight">', "").replaceAll('</span>', "");
+                if (query.length > 0) {
+                    const regex = new RegExp(query, 'gi');
+                    contentText = contentText.replaceAll(regex, '<span class="highlight">$&</span>');
+                }
+                requestValueElement.innerHTML = contentText;
+            }
+        }
     });
 }
 
@@ -115,6 +159,7 @@ function flip(e) {
         mainhint.style = "";
     }
     bonushint.classList.toggle('hidden');
+    filter();
 }
 
 function launch() {
@@ -333,7 +378,7 @@ function header(title, type) {
     return header;
 }
 
-function JWTHandler(target, body) {
+function JWTHandler(parent, target, body) {
     const jwtRegex = /eyJ[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+\/=]*/gm;
     let match;
 
@@ -343,15 +388,16 @@ function JWTHandler(target, body) {
         }
 
         match.forEach((match, groupIndex) => {
-            appendJWTDecodeButton(target, match);
+            appendJWTDecodeButton(parent, target, match);
         });
     }
 }
 
-function appendJWTDecodeButton(parent, token) {
+function appendJWTDecodeButton(parent, target, token) {
     const jwtButton = document.createElement("button");
     jwtButton.className = "jwt-button";
     jwtButton.innerHTML = "Decode JWT";
+    jwtButton.setAttribute("originalJwt", token);
 
     jwtButton.onclick = function () {
         const isToggled = jwtButton.classList.contains("toggled");
@@ -361,7 +407,7 @@ function appendJWTDecodeButton(parent, token) {
             const decodedJWTString = jwtButton.getAttribute("decodedJwt");
             const originalJWT = jwtButton.getAttribute("originalJwt");
 
-            replaceTextContent(parent, decodedJWTString, originalJWT)
+            replaceTextContent(target, decodedJWTString, originalJWT)
             replaceTextContent(jwtButton, "Original JWT", "Decode JWT")
         } else {
             const decodedJWT = decodeJWT(token);
@@ -369,7 +415,7 @@ function appendJWTDecodeButton(parent, token) {
 
             jwtButton.setAttribute("originalJwt", token);
             jwtButton.setAttribute("decodedJwt", decodedJWTString);
-            replaceTextContent(parent, token, decodedJWTString);
+            replaceTextContent(target, token, decodedJWTString);
             replaceTextContent(jwtButton, "Decode JWT", "Original JWT")
             jwtButton.classList.add("toggled");
         }
@@ -378,14 +424,10 @@ function appendJWTDecodeButton(parent, token) {
 }
 
 function replaceTextContent(element, searchText, replacementText) {
-    const nodeIterator = document.createNodeIterator(element, NodeFilter.SHOW_TEXT);
-    let currentNode;
-
-    while ((currentNode = nodeIterator.nextNode())) {
-        if (currentNode.nodeValue.includes(searchText)) {
-            const newNode = document.createTextNode(currentNode.nodeValue.replace(searchText, replacementText));
-            currentNode.parentNode.replaceChild(newNode, currentNode);
-        }
+    if (element.textContent.includes(searchText)) {
+        let text = element.innerHTML.replaceAll('<span class="highlight">', "").replaceAll('</span>', "");
+        element.innerHTML = text.replace(searchText, replacementText);
+        filter();
     }
 }
 
@@ -427,9 +469,11 @@ function left(request) {
         header.className = "request-value";
         header.innerHTML = key + ": " + value;
 
-        JWTHandler(header, value)
+        const jwtButtons = document.createElement("div");
+        JWTHandler(jwtButtons, header, value)
 
         headers.appendChild(header);
+        headers.appendChild(jwtButtons);
     }
     left.appendChild(headers);
     const body = document.createElement("div");
@@ -453,9 +497,12 @@ function left(request) {
     if (value.length === 0) {
         text.textContent = "Empty Body";
     }
-    JWTHandler(text, value)
 
+    const jwtButtons = document.createElement("div");
+    JWTHandler(jwtButtons, text, value)
     body.appendChild(text);
+    body.appendChild(jwtButtons);
+
     left.appendChild(body);
     return left;
 }
@@ -474,10 +521,12 @@ function right(response) {
         const header = document.createElement("div");
         header.className = "request-value";
 
-        JWTHandler(header, value)
+        const jwtButtons = document.createElement("div");
+        JWTHandler(jwtButtons, header, value)
 
         header.innerHTML = key + ": " + value;
         headers.appendChild(header);
+        headers.appendChild(jwtButtons);
     }
     right.appendChild(headers);
     const body = document.createElement("div");
@@ -509,10 +558,12 @@ function right(response) {
         copyToClipboard(value);
     });
 
-    JWTHandler(text, value)
+    const jwtButtons = document.createElement("div");
+    JWTHandler(jwtButtons, text, value)
 
     body.appendChild(copyButton);
     body.appendChild(text);
+    body.appendChild(jwtButtons);
     right.appendChild(body);
     return right;
 }
