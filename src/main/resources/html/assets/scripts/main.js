@@ -105,24 +105,22 @@ function filter() {
         toggleHiddenClass(child, shouldShow);
 
         if (shouldShow) {
+            const hiddenRequests = child.getElementsByClassName('bonus-hint hidden');
+            if (hiddenRequests.length > 0) {
+                return;
+            }
             const requestValueElements = child.getElementsByClassName('request-value');
             for (const requestValueElement of requestValueElements) {
-                //skip hidden requests
-                let currentElement = requestValueElement;
-                let shouldContinue = false;
-                while (currentElement.parentElement) {
-                    const parentName = currentElement.parentElement.classList.value;
-                    if (parentName.includes('bonus-hint hidden') || parentName.includes("request hidden")) {
-                        shouldContinue = true;
-                        break;
-                    }
-                    currentElement = currentElement.parentElement;
-                }
-                if (shouldContinue) {
+                let contentText = requestValueElement.innerHTML;
+                if (query.length === 1 && contentText.length > 3000) {
                     continue;
                 }
-
-                let contentText = requestValueElement.innerHTML.replaceAll('<span class="highlight">', "").replaceAll('</span>', "");
+                if (contentText.includes('<span class="highlight">' + query + '</span>')) {
+                    return; // don't check all fields, one is enough
+                }
+                if (contentText.includes('<span class="highlight">')) {
+                    contentText = contentText.replaceAll('<span class="highlight">', "").replaceAll('</span>', "");
+                }
                 if (query.length > 0) {
                     const regex = new RegExp(query, 'gi');
                     contentText = contentText.replaceAll(regex, '<span class="highlight">$&</span>');
