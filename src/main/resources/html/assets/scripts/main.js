@@ -44,6 +44,26 @@ window.onload = function () {
         }, 150);
     });
 
+    // F3 or Ctrl + F
+    window.addEventListener("keydown",function (e) {
+        if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {
+            search.focus();
+        }
+    })
+
+    // Ctrl + W to minimize all requests
+    window.addEventListener("keydown",function (e) {
+        if (e.ctrlKey && e.keyCode === 87) {
+            const display = document.getElementById('display');
+            const chevronUps = display.getElementsByClassName('fa-chevron-up');
+             for (const chevronUp of chevronUps) {
+                if (window.getComputedStyle(chevronUp).display === 'none')
+                    continue;
+                flip(chevronUp.parentNode);
+             }
+        }
+    })
+
     var methodsFilter = document.getElementById('methodsFilter');
     methodsFilter.addEventListener('change', filter);
 }
