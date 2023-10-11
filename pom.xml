@@ -6,7 +6,7 @@
 
     <groupId>com.hawolt</groupId>
     <artifactId>Netherblade</artifactId>
-    <version>1.54</version>
+    <version>1.55</version>
 
     <build>
         <plugins>
