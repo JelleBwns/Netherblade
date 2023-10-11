@@ -180,6 +180,21 @@ function flip(e) {
     filter();
 }
 
+function startws() {
+    var shouldStart;
+    var button = document.querySelector('.startws');
+    if (button.classList.contains('btn-primary')) {
+        button.classList.remove('btn-primary');
+        button.classList.add('btn-danger');
+        shouldStart = true;
+    } else {
+        button.classList.remove('btn-danger');
+        button.classList.add('btn-primary');
+        shouldStart = false;
+    }
+    call('http://localhost:35199/v1/lcu/startws/' + String(shouldStart));
+}
+
 function launch() {
     const region = document.getElementById('regions').value;
     fetch('http://localhost:35199/v1/client/launch/' + region)
@@ -207,6 +222,8 @@ function connect(host) {
             appendXMPP(json);
         } else if (json['type'] === 'rms') {
             appendRMS(json);
+        }  else if (json['type'] === 'lcu') {
+            appendLCU(json);
         } else {
             console.log("unknown type: " + json['type']);
         }
@@ -228,6 +245,10 @@ function appendRTMP(json) {
 
 function appendRMS(json) {
     appendSpecial('RMS', json);
+}
+
+function appendLCU(json) {
+    appendSpecial('LCU', json);
 }
 
 function appendSpecial(name, json) {
@@ -295,6 +316,10 @@ function hintSpecial(name, ingoing, value) {
 
             }
             break;
+        case "LCU":
+            uri.innerHTML = value['eventType'] + ' ' + value['uri'];
+            value = 'lcu' + JSON.stringify(value['data'], null, 2);
+        break;
     }
     main.appendChild(uri);
     const code = document.createElement("div");
@@ -330,6 +355,9 @@ function content(value) {
             text.textContent = formatXml(value);
             break
         default:
+            if (value.startsWith("lcu")) {
+                value = value.slice(3);
+            }
             text.textContent = value;
             break
     }
@@ -337,13 +365,13 @@ function content(value) {
         if (text.textContent.trim().length === 0 || text.textContent === "Empty Body") {
             return;
         }
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(text);
-        selection.removeAllRanges();
-        selection.addRange(range);
-        document.execCommand("copy");
-        selection.removeAllRanges();
+//        const selection = window.getSelection();
+//        const range = document.createRange();
+//        range.selectNodeContents(text);
+//        selection.removeAllRanges();
+//        selection.addRange(range);
+//        document.execCommand("copy");
+//        selection.removeAllRanges();
     }
     body.appendChild(text);
     center.appendChild(body);
@@ -610,8 +638,10 @@ function expand() {
 }
 
 function encoding(o) {
-    if (o.length === 0) return "plain";
+    if (!o || o.length === 0) return "plain";
+    else if (typeof o === "string" && o.startsWith("lcu")) return "plain";
     else if (JSON.stringify(o).charAt(0) === '{') return "json";
+    else if (typeof o !== "string") return "plain";
     else if (o.charAt(0) === '{') return "json";
     else if (o.charAt(0) === '<') return "xml";
     else return "plain";

@@ -4,6 +4,8 @@ import com.hawolt.io.Core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +24,17 @@ public class WMIC {
         try (InputStream stream = process.getInputStream()) {
             return Core.read(stream).toString();
         }
+    }
+
+    public static List<LeagueClient> retrieve() throws IOException {
+        List<LeagueClient> list = new ArrayList<>();
+        for (String line : wmic().split(System.lineSeparator())) {
+            if (!line.startsWith("LeagueClientUx.exe")) continue;
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.find())
+                list.add(new LeagueClient(matcher.group(1), matcher.group(3), matcher.group(5), matcher.group(7)));
+        }
+        return list;
     }
 
     public static LeagueClient retrieve(String port) throws IOException {
