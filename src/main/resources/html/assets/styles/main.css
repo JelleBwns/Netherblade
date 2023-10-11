@@ -167,6 +167,11 @@ body {
     border-radius: 0.5rem !important;
 }
 
+.highlight {
+  background-color: yellow;
+  color: black;
+}
+
 .flexing {
     align-items: center;
     align-content: center;
