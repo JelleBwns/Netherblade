@@ -47,6 +47,7 @@ public class LocalExecutor {
         for (String region : LocalSystemYaml.config.keySet()) {
             array.put(region);
         }
+        array.put("PBE");
         object.put("regions", array);
         context.result(object.toString());
     };
@@ -54,9 +55,11 @@ public class LocalExecutor {
     private final static String[] SUPPORTED = new String[]{"GET", "HEAD", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"};
 
     private static final Handler LAUNCH = context -> {
+        String region = context.pathParam("region");
         String client = LocaleInstallation.RIOT_CLIENT_SERVICES.toString();
         try {
-            Runtime.getRuntime().exec(String.join(" ", client, "--client-config-url=\"http://127.0.0.1:" + StaticConstants.PORT_MAPPING.get("config") + "\"", "--launch-product=league_of_legends", "--launch-patchline=live", "--allow-multiple-clients"));
+            String patchline = region.equals("PBE") ? "pbe" : "live";
+            Runtime.getRuntime().exec(String.join(" ", client, "--client-config-url=\"http://127.0.0.1:" + StaticConstants.PORT_MAPPING.get("config") + "\"", "--launch-product=league_of_legends", "--launch-patchline=" + patchline, "--allow-multiple-clients"));
         } catch (IOException e) {
             Logger.error(e);
         }
