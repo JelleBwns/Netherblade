@@ -37,7 +37,33 @@ window.onload = function () {
         }
     });
     var search = document.getElementById('search');
-    search.addEventListener('keyup', filter);
+    var timer;
+    search.addEventListener('keyup', function() {
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+            filter();
+        }, 150);
+    });
+
+    // F3 or Ctrl + F
+    window.addEventListener("keydown",function (e) {
+        if (e.keyCode === 114 || (e.ctrlKey && e.keyCode === 70)) {
+            search.focus();
+        }
+    })
+
+    // Ctrl + W to minimize all requests
+    window.addEventListener("keydown",function (e) {
+        if (e.ctrlKey && e.keyCode === 87) {
+            const display = document.getElementById('display');
+            const chevronUps = display.getElementsByClassName('fa-chevron-up');
+             for (const chevronUp of chevronUps) {
+                if (window.getComputedStyle(chevronUp).display === 'none')
+                    continue;
+                flip(chevronUp.parentNode);
+             }
+        }
+    })
 
     var methodsFilter = document.getElementById('methodsFilter');
     methodsFilter.addEventListener('change', filter);
@@ -84,9 +110,45 @@ function filter() {
     children.forEach((child) => {
         if (child.outerHTML === undefined) return;
         const method = child.querySelector('.method').innerHTML.toLowerCase();
-        const source = child.outerHTML.toLowerCase();
-        const shouldShow = source.includes(query) && (selected === 'all' || method === selected);
+        // only search in these classes
+        const selectedElements = child.querySelectorAll('.request-value, .uri, .code, .jwt-button');
+        let source = '';
+        selectedElements.forEach((element) => {
+            // include decoded JWTs
+            if (element.classList.contains('jwt-button')) {
+                source += element.outerHTML.replace(/&quot;/g, '"') + " ";
+            }
+            else {
+                source += element.textContent + " ";
+            }
+        });
+        const shouldShow = source.toLowerCase().includes(query) && (selected === 'all' || method === selected);
         toggleHiddenClass(child, shouldShow);
+
+        if (shouldShow) {
+            const hiddenRequests = child.getElementsByClassName('bonus-hint hidden');
+            if (hiddenRequests.length > 0) {
+                return;
+            }
+            const requestValueElements = child.getElementsByClassName('request-value');
+            for (const requestValueElement of requestValueElements) {
+                let contentText = requestValueElement.innerHTML;
+                if (query.length === 1 && contentText.length > 3000) {
+                    continue;
+                }
+                if (contentText.includes('<span class="highlight">' + query + '</span>')) {
+                    return; // don't check all fields, one is enough
+                }
+                if (contentText.includes('<span class="highlight">')) {
+                    contentText = contentText.replaceAll('<span class="highlight">', "").replaceAll('</span>', "");
+                }
+                if (query.length > 0) {
+                    const regex = new RegExp(query, 'gi');
+                    contentText = contentText.replaceAll(regex, '<span class="highlight">$&</span>');
+                }
+                requestValueElement.innerHTML = contentText;
+            }
+        }
     });
 }
 
@@ -116,6 +178,22 @@ function flip(e) {
         mainhint.style = "";
     }
     bonushint.classList.toggle('hidden');
+    filter();
+}
+
+function startws() {
+    var shouldStart;
+    var button = document.querySelector('.startws');
+    if (button.classList.contains('btn-primary')) {
+        button.classList.remove('btn-primary');
+        button.classList.add('btn-danger');
+        shouldStart = true;
+    } else {
+        button.classList.remove('btn-danger');
+        button.classList.add('btn-primary');
+        shouldStart = false;
+    }
+    call('http://localhost:35199/v1/lcu/startws/' + String(shouldStart));
 }
 
 function launch() {
@@ -145,6 +223,8 @@ function connect(host) {
             appendXMPP(json);
         } else if (json['type'] === 'rms') {
             appendRMS(json);
+        }  else if (json['type'] === 'lcu') {
+            appendLCU(json);
         } else {
             console.log("unknown type: " + json['type']);
         }
@@ -166,6 +246,10 @@ function appendRTMP(json) {
 
 function appendRMS(json) {
     appendSpecial('RMS', json);
+}
+
+function appendLCU(json) {
+    appendSpecial('LCU', json);
 }
 
 function appendSpecial(name, json) {
@@ -233,6 +317,10 @@ function hintSpecial(name, ingoing, value) {
 
             }
             break;
+        case "LCU":
+            uri.innerHTML = value['eventType'] + ' ' + value['uri'];
+            value = 'lcu' + JSON.stringify(value['data'], null, 2);
+        break;
     }
     main.appendChild(uri);
     const code = document.createElement("div");
@@ -268,6 +356,9 @@ function content(value) {
             text.textContent = formatXml(value);
             break
         default:
+            if (value.startsWith("lcu")) {
+                value = value.slice(3);
+            }
             text.textContent = value;
             break
     }
@@ -275,13 +366,13 @@ function content(value) {
         if (text.textContent.trim().length === 0 || text.textContent === "Empty Body") {
             return;
         }
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(text);
-        selection.removeAllRanges();
-        selection.addRange(range);
-        document.execCommand("copy");
-        selection.removeAllRanges();
+//        const selection = window.getSelection();
+//        const range = document.createRange();
+//        range.selectNodeContents(text);
+//        selection.removeAllRanges();
+//        selection.addRange(range);
+//        document.execCommand("copy");
+//        selection.removeAllRanges();
     }
     body.appendChild(text);
     center.appendChild(body);
@@ -334,7 +425,7 @@ function header(title, type) {
     return header;
 }
 
-function JWTHandler(target, body) {
+function JWTHandler(parent, target, body) {
     const jwtRegex = /eyJ[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+\/=]*/gm;
     let match;
 
@@ -344,15 +435,16 @@ function JWTHandler(target, body) {
         }
 
         match.forEach((match, groupIndex) => {
-            appendJWTDecodeButton(target, match);
+            appendJWTDecodeButton(parent, target, match);
         });
     }
 }
 
-function appendJWTDecodeButton(parent, token) {
+function appendJWTDecodeButton(parent, target, token) {
     const jwtButton = document.createElement("button");
     jwtButton.className = "jwt-button";
     jwtButton.innerHTML = "Decode JWT";
+    jwtButton.setAttribute("originalJwt", token);
 
     jwtButton.onclick = function () {
         const isToggled = jwtButton.classList.contains("toggled");
@@ -362,7 +454,7 @@ function appendJWTDecodeButton(parent, token) {
             const decodedJWTString = jwtButton.getAttribute("decodedJwt");
             const originalJWT = jwtButton.getAttribute("originalJwt");
 
-            replaceTextContent(parent, decodedJWTString, originalJWT)
+            replaceTextContent(target, decodedJWTString, originalJWT)
             replaceTextContent(jwtButton, "Original JWT", "Decode JWT")
         } else {
             const decodedJWT = decodeJWT(token);
@@ -370,7 +462,7 @@ function appendJWTDecodeButton(parent, token) {
 
             jwtButton.setAttribute("originalJwt", token);
             jwtButton.setAttribute("decodedJwt", decodedJWTString);
-            replaceTextContent(parent, token, decodedJWTString);
+            replaceTextContent(target, token, decodedJWTString);
             replaceTextContent(jwtButton, "Decode JWT", "Original JWT")
             jwtButton.classList.add("toggled");
         }
@@ -379,14 +471,10 @@ function appendJWTDecodeButton(parent, token) {
 }
 
 function replaceTextContent(element, searchText, replacementText) {
-    const nodeIterator = document.createNodeIterator(element, NodeFilter.SHOW_TEXT);
-    let currentNode;
-
-    while ((currentNode = nodeIterator.nextNode())) {
-        if (currentNode.nodeValue.includes(searchText)) {
-            const newNode = document.createTextNode(currentNode.nodeValue.replace(searchText, replacementText));
-            currentNode.parentNode.replaceChild(newNode, currentNode);
-        }
+    if (element.textContent.includes(searchText)) {
+        let text = element.innerHTML.replaceAll('<span class="highlight">', "").replaceAll('</span>', "");
+        element.innerHTML = text.replace(searchText, replacementText);
+        filter();
     }
 }
 
@@ -428,9 +516,11 @@ function left(request) {
         header.className = "request-value";
         header.innerHTML = key + ": " + value;
 
-        JWTHandler(header, value)
+        const jwtButtons = document.createElement("div");
+        JWTHandler(jwtButtons, header, value)
 
         headers.appendChild(header);
+        headers.appendChild(jwtButtons);
     }
     left.appendChild(headers);
     const body = document.createElement("div");
@@ -454,9 +544,12 @@ function left(request) {
     if (value.length === 0) {
         text.textContent = "Empty Body";
     }
-    JWTHandler(text, value)
 
+    const jwtButtons = document.createElement("div");
+    JWTHandler(jwtButtons, text, value)
     body.appendChild(text);
+    body.appendChild(jwtButtons);
+
     left.appendChild(body);
     return left;
 }
@@ -475,10 +568,12 @@ function right(response) {
         const header = document.createElement("div");
         header.className = "request-value";
 
-        JWTHandler(header, value)
+        const jwtButtons = document.createElement("div");
+        JWTHandler(jwtButtons, header, value)
 
         header.innerHTML = key + ": " + value;
         headers.appendChild(header);
+        headers.appendChild(jwtButtons);
     }
     right.appendChild(headers);
     const body = document.createElement("div");
@@ -510,10 +605,12 @@ function right(response) {
         copyToClipboard(value);
     });
 
-    JWTHandler(text, value)
+    const jwtButtons = document.createElement("div");
+    JWTHandler(jwtButtons, text, value)
 
     body.appendChild(copyButton);
     body.appendChild(text);
+    body.appendChild(jwtButtons);
     right.appendChild(body);
     return right;
 }
@@ -542,8 +639,10 @@ function expand() {
 }
 
 function encoding(o) {
-    if (o.length === 0) return "plain";
+    if (!o || o.length === 0) return "plain";
+    else if (typeof o === "string" && o.startsWith("lcu")) return "plain";
     else if (JSON.stringify(o).charAt(0) === '{') return "json";
+    else if (typeof o !== "string") return "plain";
     else if (o.charAt(0) === '{') return "json";
     else if (o.charAt(0) === '<') return "xml";
     else return "plain";

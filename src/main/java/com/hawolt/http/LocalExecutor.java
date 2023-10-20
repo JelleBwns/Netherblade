@@ -4,6 +4,7 @@ import com.hawolt.http.proxy.BasicProxyServer;
 import com.hawolt.http.proxy.CookieHandler;
 import com.hawolt.http.proxy.ProxyRequest;
 import com.hawolt.http.proxy.ProxyResponse;
+import com.hawolt.lcu.LCUWebSocket;
 import com.hawolt.logger.Logger;
 import com.hawolt.mitm.CommunicationType;
 import com.hawolt.mitm.Unsafe;
@@ -74,6 +75,14 @@ public class LocalExecutor {
         register("auth", "https://auth.riotgames.com", id);
         register("authenticator", "https://authenticate.riotgames.com", id);
         register("entitlements", "https://entitlements.auth.riotgames.com", id);
+    };
+
+    private static final Handler STARTWS = context -> {
+        String shouldStart = context.pathParam("shouldStart");
+        if (shouldStart.equals("true"))
+            LCUWebSocket.launch();
+        else
+            LCUWebSocket.disconnect();
     };
 
     public static void register(String type, String target, String id) {
@@ -159,6 +168,9 @@ public class LocalExecutor {
             path("/client", () -> {
                 get("/available", LocalExecutor.AVAILABLE);
                 get("/launch/{region}", LocalExecutor.LAUNCH);
+            });
+            path("/lcu", () -> {
+                get("/startws/{shouldStart}", LocalExecutor.STARTWS);
             });
             path("/config", () -> {
                 get("/load", RuleInterpreter.RELOAD);

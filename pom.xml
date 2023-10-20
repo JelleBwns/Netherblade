@@ -6,7 +6,7 @@
 
     <groupId>com.hawolt</groupId>
     <artifactId>Netherblade</artifactId>
-    <version>1.54</version>
+    <version>1.56</version>
 
     <build>
         <plugins>
@@ -104,7 +104,7 @@
         <dependency>
             <groupId>com.github.hawolt</groupId>
             <artifactId>league-of-legends-rtmp</artifactId>
-            <version>b88d43094b</version>
+            <version>88eefd771d</version>
         </dependency>
     </dependencies>
 </project>
