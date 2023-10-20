@@ -11,11 +11,12 @@ window.onload = function () {
                 option.value = region;
                 dropdown.appendChild(option);
             });
-            // sort dropdown and make TEST always last
+            // sort dropdown and make TEST and PBE always last
             let options = Array.from(dropdown.options);
             options.sort((a, b) => {
-                if (a.value === "TEST") return 1;
-                if (b.value === "TEST") return -1;
+                if (a.value === "TEST" && b.value === "PBE") return -1;
+                if (a.value === "TEST" || a.value === "PBE") return 1;
+                if (b.value === "TEST" || b.value === "PBE") return -1;
                 return a.value.localeCompare(b.value);
             });
             dropdown.innerHTML = "";
